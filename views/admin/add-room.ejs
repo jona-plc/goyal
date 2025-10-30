@@ -15,9 +15,6 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* ==========================
-   Navbar
-========================== */
 .navbar {
   position: fixed;
   top: 0;
@@ -54,9 +51,6 @@ body {
   gap: 8px;
 }
 
-/* ==========================
-   Sidebar
-========================== */
 .sidebar {
   position: fixed;
   top: 0;
@@ -95,12 +89,9 @@ body {
   border-radius: 5px;
 }
 
-/* ==========================
-   Main Content
-========================== */
 .main-content {
-  margin-top: 70px;       /* space for navbar */
-  margin-left: 250px;     /* space for sidebar */
+  margin-top: 70px;       
+  margin-left: 250px;     
   padding: 20px 40px;
   min-height: calc(100vh - 70px);
   background-color: #f9f8f3;
@@ -109,9 +100,6 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* ==========================
-   Buttons
-========================== */
 .btn-danger {
   background: linear-gradient(45deg, #b30000, #ff4d4d);
   border: none;
@@ -123,9 +111,6 @@ body {
   box-shadow: 0 0 15px rgba(255,0,0,0.4);
 }
 
-/* ==========================
-   Custom Dropdown Hover
-========================== */
 .custom-dropdown .dropdown-item:hover {
   background: #b80707;
   color: #fff;
@@ -133,9 +118,6 @@ body {
   transition: all 0.2s;
 }
 
-/* ==========================
-   Dark Mode
-========================== */
 .dark-mode {
   background-color: #111;
   color: #e1e1e1;
@@ -177,9 +159,6 @@ body {
   color: #ffd700 !important;
 }
 
-/* ==========================
-   Table Adjustments (for dark mode)
-========================== */
 .dark-mode .table {
   color: #fff;
 }
@@ -189,9 +168,6 @@ body {
   color: #ffd700;
 }
 
-/* ==========================
-   Responsive Layout
-========================== */
 @media (max-width: 768px) {
   .sidebar {
     position: relative;
@@ -243,7 +219,7 @@ body {
 
           </ul>
         </li>
-        <a href="/admin/logout" class="btn btn-danger ms-2">
+        <a href="/logout" class="btn btn-danger ms-2">
           <i class="bi bi-box-arrow-right"></i> Logout
         </a>
       </div>

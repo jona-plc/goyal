@@ -744,7 +744,6 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
     const parsedMonthlyRent = parseFloat(monthly_rent) || 0;
     const finalDeposit = parseFloat(deposit) || 0;
 
-    // 🔹 1️⃣ Get current room & bed of tenant
     const [[currentTenant]] = await conn.query(
       'SELECT room_id, bed_id FROM tenants WHERE id = ?',
       [tenantId]
@@ -753,15 +752,12 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
     const oldRoomId = currentTenant?.room_id;
     const oldBedId = currentTenant?.bed_id;
 
-    // 🔹 2️⃣ Get new room_id based on room_number
     const [[roomData]] = await conn.query(
       'SELECT id FROM rooms WHERE room_number = ?',
       [room_number]
     );
 
     const room_id = roomData ? roomData.id : oldRoomId;
-
-    // 🔹 3️⃣ Get new bed_id
     const [[bedData]] = await conn.query(
       'SELECT id FROM beds WHERE bed_number = ? AND room_id = ?',
       [bed, room_id]
@@ -769,7 +765,6 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
 
     const bed_id = bedData ? bedData.id : oldBedId;
 
-    // 🔹 4️⃣ Update tenant info (remove `room_number` and `bed` columns)
     let query = `
       UPDATE tenants SET
         first_name = ?, middle_name = ?, last_name = ?, address = ?, age = ?, year_level = ?, contact_number = ?,
@@ -798,7 +793,6 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
 
     await conn.query(query, values);
 
-    // 🔹 5️⃣ Update bed statuses
     if (oldBedId && oldBedId !== bed_id) {
       await conn.query(`UPDATE beds SET status = 'Available' WHERE id = ?`, [oldBedId]);
     }
@@ -807,7 +801,6 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
       await conn.query(`UPDATE beds SET status = 'Occupied' WHERE id = ?`, [bed_id]);
     }
 
-    // 🔹 6️⃣ Update room statuses like in /admin/add-rooms
     await conn.query(`
       UPDATE rooms 
       SET status = CASE 
