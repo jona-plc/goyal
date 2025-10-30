@@ -404,46 +404,6 @@ app.get("/admin/api/available-beds", async (req, res) => {
   }
 });
 
-// Express route for exporting payments
-app.get('/admin/export-payments', async (req, res) => {
-  try {
-    // Kunin lahat ng payments mula sa database
-    const payments = await Payment.findAll({ 
-      include: [{ model: Tenant, attributes: ['name'] }] // optional: para makuha ang tenant_name
-    });
-
-    // CSV header
-    let csv = 'id,tenant_id,amount,payment_date,status,payment_method,xendit_invoice_id,transaction_ref_url,coverage_period,tenant_name\n';
-
-    // CSV rows
-    payments.forEach(p => {
-      const row = [
-        p.id,
-        p.tenant_id,
-        p.amount,
-        p.payment_date ? p.payment_date.toISOString() : '',
-        p.status,
-        p.payment_method || '',
-        p.xendit_invoice_id || '',
-        p.transaction_ref_url || '',
-        p.coverage_period || '',
-        p.Tenant ? p.Tenant.name : ''
-      ];
-      csv += row.map(field => `"${field}"`).join(',') + '\n';
-    });
-
-    // Response headers para ma-download bilang CSV
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="payments.csv"');
-
-    // Send CSV
-    res.send(csv);
-
-  } catch (err) {
-    console.error('Error exporting payments:', err);
-    res.status(500).send('Error exporting payments');
-  }
-});
 
 const PDFDocument = require('pdfkit');
 
