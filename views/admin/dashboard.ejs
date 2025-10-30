@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GOYAL BOARDING HOUSE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+ body {
+      background-color: #f9f8f3;
+      padding-top: 70px;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+.sidebar a.active {
+  background-color: #ffd700;
+  color: #000;
+  font-weight: 600;
+  border-radius: 5px;
+}
+.sidebar a:hover {
+  background-color: rgba(255, 215, 0, 0.3);
+  color: #000;
+}
+
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 250px);
+  margin-left: 250px;
+  z-index: 1000;
+  background: whitesmoke;
+  box-shadow: 0 4px 10px rgba(199, 15, 15, 0.15);
+}
+
+.navbar-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4b2626 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+    
+    .navbar .nav-link,
+    #darkModeToggle {
+      color: #302828 !important;
+      font-weight: 600;
+    }
+
+    #darkModeToggle:hover {
+      color: #b80707;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 250px;
+      background: linear-gradient( #000f06, #3d3f39b7, #0f1113d7);
+      padding-top: 90px;
+      color: #fff;
+      z-index: 1000;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px;
+      color: #f7f5f1;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      padding-left: 25px;
+      color: #000;
+    }
+    .card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+.card-header {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.custom-dropdown .dropdown-item:hover {
+  background: #b80707;
+  color: #fff;
+  transform: translateX(5px);
+}
+.card-summary {
+  text-align: center;
+  color: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-summary i {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.card-summary h5 {
+  margin-bottom: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.card-summary p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.card-summary:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.card-summary.blue {
+  background: linear-gradient(135deg, #007bff, #00a8ff);
+}
+
+.card-summary.red {
+  background: linear-gradient(135deg, #ff4d4d, #ff6b6b);
+}
+
+.card-summary.green {
+  background: linear-gradient(135deg, #28a745, #5cd85c);
+}
+
+.btn-light {
+  color: #333;
+  font-weight: 500;
+}
+
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      width: calc(100% - 250px);
+    }
+
+    .dark-mode {
+      background-color: #111;
+      color: #e1e1e1;
+    }
+
+    .dark-mode .navbar {
+      background: linear-gradient(45deg, #2c2c2c, #1a1a1a);
+    }
+
+    .dark-mode .sidebar {
+      background: #1c1c1c;
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a {
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a:hover {
+      background-color: #ffd700;
+      color: #000;
+    }
+
+    .dark-mode .card-summary {
+      background: linear-gradient(135deg, #444, #222);
+      color: #ffd700;
+    }
+
+    .dark-mode .navbar-brand {
+      color: #ffd700 !important;
+    }
+
+    .dark-mode #darkModeToggle {
+      color: #ffd700 !important;
+    }
+
+    .btn-danger {
+      background: linear-gradient(45deg, #b30000, #ff4d4d);
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(45deg, #ff4d4d, #ff6666);
+      box-shadow: 0 0 15px rgba(255,0,0,0.4);
+    }
+    /* Recent Payments Enhancements */
+.recent-activity-item {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.8s ease;
+  display: none;
+}
+.recent-activity-item.show {
+  opacity: 1;
+  transform: translateY(0);
+  display: block;
+}
+
+.icon-circle {
+  width: 60px;
+  height: 60px;
+  background: rgba(0, 123, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  color: #007bff;
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,123,255,0.5); }
+  50% { box-shadow: 0 0 20px 8px rgba(0,123,255,0.2); }
+}
+
+.live-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #ff4d4d;
+  border-radius: 50%;
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.2); }
+}
+
+.live-card {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+  </style>
+</head>
+
+<body>
+<div class="sidebar">
+  <a href="/admin/dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+  <a href="/admin/financial-analytics"><i class="bi bi-bar-chart"></i> Financial Analytics</a>
+  <a href="/admin/create-tenant"><i class="bi bi-person"></i>Tenant Registration</a>
+  <a href="/admin/tenant-information"><i class="bi bi-person-gear"></i> Manage Tenants</a>
+  <a href="/admin/occupants"><i class="bi bi-collection"></i> Occupants</a>
+  <a href="/admin/payments"><i class="bi bi-credit-card-2-front"></i> Payment Transaction</a>
+  <a href="/admin/add-rooms"><i class="bi bi-door-open"></i> Manage Rooms</a>
+<a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+</div>
+
+
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard"><i class="bi bi-speedometer2"></i> GOYAL PORTAL</a>
+      <div class="navbar-nav ms-auto">
+        <button id="darkModeToggle" onclick="toggleDarkMode()">
+          <span id="darkModeIcon" class="bi bi-sun"></span>
+        </button>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" data-bs-toggle="dropdown">
+            <i class="bi bi-grid"></i> Features
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="featuresDropdown">
+            <li><a class="dropdown-item" href="/admin/issue-tracking">Issue Tracking</a></li>
+            <li><a class="dropdown-item" href="/admin/move-out-requests">Move-Out Requests</a></li>
+            <li><a class="dropdown-item" href="/admin/announcements">Announcements</a>
+
+          </ul>
+        </li>
+        <a href="/logout" class="btn btn-danger ms-2">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+  <main class="main-content container-fluid px-4">
+  <!-- PAGE HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+    <button class="btn btn-outline-dark btn-sm" onclick="location.reload()">
+      <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="row g-4 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card card-summary blue">
+        <div class="card-body">
+          <i class="bi bi-person-lines-fill mb-2"></i>
+          <h6>Registered Tenants</h6>
+          <h5><%= totalTenants %></h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card card-summary red">
+        <div class="card-body">
+          <i class="bi bi-person-check-fill mb-2"></i>
+          <h6>Active Users</h6>
+          <h5><%= activeUsers %></h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card card-summary green">
+        <div class="card-body">
+          <i class="bi bi-cash-coin mb-2"></i>
+          <h6>Monthly Income</h6>
+          <h5>₱<%= monthlyIncome.toLocaleString() %></h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card card-summary blue">
+        <div class="card-body">
+          <i class="bi bi-wallet-fill mb-2"></i>
+          <h6>Total Income</h6>
+          <h5>₱<%= totalIncome.toLocaleString() %></h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART SECTION -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h6 class="mb-0 fw-semibold"><i class="bi bi-graph-up"></i> Monthly Income Trend</h6>
+      <div>
+        <span class="badge bg-primary">Updated</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <canvas id="incomeChart" height="100"></canvas>
+    </div>
+  </div>
+  <!-- RECENT TENANT PAYMENTS -->
+<div class="card shadow-sm mb-4 live-card">
+  <div class="card-header d-flex align-items-center justify-content-between" 
+       style="background: linear-gradient(90deg, #007bff, #00bfff); color: white;">
+    <h6 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+      <i class="bi bi-credit-card-2-front"></i> Recent Tenant Payments
+    </h6>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-light text-dark px-3 py-2 shadow-sm">Live</span>
+      <span class="live-dot"></span>
+    </div>
+  </div>
+
+  <div class="card-body py-4 position-relative" id="recent-activity-container" style="min-height: 180px;">
+    <% if (recentPayments && recentPayments.length > 0) { %>
+      <% recentPayments.forEach((p, i) => { %>
+        <div class="recent-activity-item fade-item <%= i === 0 ? 'show' : '' %>">
+          <div class="icon-circle mx-auto mb-3 glow">
+            <i class="bi bi-wallet2"></i>
+          </div>
+          <h6 class="fw-bold text-dark mb-1"><%= p.tenant_name %></h6>
+          <p class="text-muted small mb-0">
+            <span class="fw-semibold text-success">₱<%= p.amount.toLocaleString() %></span> 
+            via 
+            <span class="text-primary"><%= p.payment_method || 'N/A' %></span>
+          </p>
+          <p class="small text-secondary mb-0">
+            <i class="bi bi-calendar-event"></i> 
+            <%= new Date(p.payment_date).toLocaleDateString() %>
+          </p>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p class="text-muted mb-0 text-center">No recent payments available.</p>
+    <% } %>
+  </div>
+</div>
+
+
+</main>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const items = document.querySelectorAll(".recent-activity-item");
+  let index = 0;
+
+  if (items.length > 1) {
+    setInterval(() => {
+      items[index].classList.add("hide");
+      setTimeout(() => {
+        items[index].style.display = "none";
+        items[index].classList.remove("hide");
+        index = (index + 1) % items.length;
+        items[index].style.display = "block";
+        setTimeout(() => (items[index].style.opacity = 1), 100);
+      }, 500);
+    }, 3500);
+  }
+});
+</script>
+
+
+<script>
+  const links = document.querySelectorAll('.sidebar a');
+  const currentPath = window.location.pathname;
+
+  links.forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+      link.classList.add('active');
+    }
+  });
+</script>
+
+<script id="chartLabelsData" type="application/json">
+  <%- incomeChartLabels %>
+</script>
+<script id="chartValuesData" type="application/json">
+  <%- incomeChartData %>
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const isDarkMode = localStorage.getItem("darkMode") === "true";
+    if (isDarkMode) {
+      document.body.classList.add("dark-mode");
+      document.getElementById("darkModeIcon").classList.remove("bi-sun");
+      document.getElementById("darkModeIcon").classList.add("bi-moon");
+    }
+  });
+
+  function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle("dark-mode");
+
+    const isDarkMode = body.classList.contains("dark-mode");
+    localStorage.setItem("darkMode", isDarkMode);
+
+    const icon = document.getElementById("darkModeIcon");
+    icon.classList.toggle("bi-sun");
+    icon.classList.toggle("bi-moon");
+  }
+</script>
+
+
+<script>
+  const ctx = document.getElementById('incomeChart').getContext('2d');
+
+  const chartLabels = JSON.parse(document.getElementById('chartLabelsData').textContent);
+  const chartData = JSON.parse(document.getElementById('chartValuesData').textContent);
+
+  const incomeChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        label: 'Monthly Income',
+        data: chartData,
+        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+        borderColor: '#0d6efd',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true } },
+      plugins: { legend: { display: false } },
+      responsive: true
+    }
+  });
+</script>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  socket.on('activeUsersUpdate', (count) => {
+    document.querySelector('.bg-active p').textContent = count;
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

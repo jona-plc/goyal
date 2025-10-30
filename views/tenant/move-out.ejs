@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GOYAL BOARDING HOUSE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  
+  <style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f6fb;
+  color: #212529;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 0.75rem 1.5rem;
+  z-index: 1100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.navbar > .container-fluid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  width: 100%;
+}
+
+.navbar > .container-fluid > div.d-flex.align-items-center.gap-2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.navbar .btn.position-relative.p-1 {
+  flex-shrink: 0;
+}
+
+ .desktop-sidebar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 240px;
+  height: calc(100vh - 60px);
+  background: linear-gradient(#000f06, #3d3f39b7, #0f1113d7); /* Fixed */
+  padding: 2.5rem 1.25rem;
+  color: #fff;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+  z-index: 1040;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0 1rem 1rem 0;
+}
+
+@media (max-width: 991.98px) {
+  .desktop-sidebar {
+    transform: translateX(-100%);
+  }
+  .desktop-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@media (min-width: 992px) {
+  .desktop-sidebar {
+    transform: none !important;
+  }
+  body {
+    margin-left: 240px;
+  }
+}
+
+.desktop-sidebar .nav-link {
+  color: #ffffff;
+  border-radius: 0.5rem;
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+}
+
+.desktop-sidebar .nav-link:hover,
+.desktop-sidebar .nav-link.active {
+  background-color:#ffd700;
+  color: #0d2b45 !important;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.7);
+  text-decoration: none;
+}
+
+.desktop-sidebar .text-center h6 {
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.03em;
+}
+
+.desktop-sidebar .text-center p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 0;
+}
+
+.tenant-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 4px solid #d4c28e;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: box-shadow 0.3s ease;
+}
+
+.tenant-avatar:hover,
+.tenant-avatar:focus {
+  box-shadow: 0 6px 20px rgba(255, 193, 7, 0.8);
+  outline: none;
+}
+
+#sidebarBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+  z-index: 1035;
+}
+
+#sidebarBackdrop.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+    .main-content {
+      padding: 2.5rem 2rem;
+      padding-top: 6rem; 
+      background: #fff;
+      min-height: 100vh;
+    }
+#notificationBell { 
+  position: relative; 
+  background: transparent; 
+  border: none; 
+  font-size:1.25rem; 
+  color:#0d2b45; 
+  cursor:pointer; 
+}
+#notificationBell:hover { color:#0d2b45; }
+#notificationBell .badge { 
+  position:absolute; 
+  top:0; 
+  right:0; 
+  font-size:0.65rem; 
+  background:red; 
+  color:white; 
+  border-radius:50%; 
+  padding:0.15em 0.3em; 
+}
+
+#notificationDropdown { 
+  min-width: 200px;       
+  max-width: 240px; 
+  max-height: 250px;
+  overflow-y: auto; 
+  right: 0; 
+  left: auto; 
+  padding: 0.25rem 0; 
+}
+
+.notification-item { 
+  padding: 0.3rem 0.5rem;   
+  border-bottom: 1px solid #e9ecef; 
+  cursor: pointer; 
+  text-align: center;      
+  font-size: 0.85rem;
+  word-break: break-word; 
+  border-radius: 0.4rem; 
+  margin: 0.1rem 0; 
+  background-color: #f8f9fa; 
+  transition: background 0.2s ease;
+}
+
+.notification-item:last-child { border-bottom: none; }
+.notification-item:hover { background-color: #e2e6ea; }
+
+.notification-item .time { 
+  font-size: 0.65rem; 
+  color: #6c757d; 
+  display: block;
+  margin-top: 0.15rem;
+}
+ #toggleSidebarDesktop i {
+  color: #2b2b2b;  
+  transition: color 0.3s ease;
+}
+
+#toggleSidebarDesktop:hover i {
+  color: #000; 
+}
+
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      border: none;
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+      background: #fff;
+    }
+
+    .card:hover,
+    .card:focus-within {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transform: translateY(-4px);
+    }
+   
+    .card-header {
+  background-color: #d4c28e; 
+  color: #0d2b45;
+  font-weight: 700;
+  font-size: 1.1rem;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem 1rem 0 0;
+}
+
+.btn-submit {
+  background-color: #d4c28e; 
+  color: #0d2b45;
+  border: none;
+  font-weight: 700;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover,
+.btn-submit:focus {
+  background-color: #b7a46a; 
+  color: #0d2b45;
+  outline: none;
+}
+
+
+    .form-label {
+      font-weight: 600;
+    }
+
+    .desktop-sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .desktop-sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .desktop-sidebar::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 193, 7, 0.5);
+      border-radius: 4px;
+    }
+
+    @media (max-width: 575.98px) {
+      .desktop-sidebar {
+        width: 200px;
+      }
+      body {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    
+    <div class="d-flex align-items-center gap-2">
+      <button id="toggleSidebarDesktop" class="btn btn-outline-light d-lg-none p-1" aria-label="Toggle sidebar" aria-expanded="false">
+        <i class="bi bi-list fs-5"></i>
+      </button>
+      <a class="navbar-brand d-flex align-items-center gap-1 fs-6 text-dark" href="#">
+        <i class="bi bi-house-door-fill fs-6"></i>
+        <span>Tenant Portal</span>
+      </a>
+    </div>
+
+
+       <a href="/tenant/logout" class="btn btn-white-custom btn-sm fw-semibold py-1 px-2 d-flex align-items-center gap-1">
+        <i class="bi bi-box-arrow-right fs-6"></i> Logout
+      </a>
+    </div>
+  </div>
+</nav>
+
+
+  <aside class="desktop-sidebar" id="desktopSidebar" role="navigation" aria-label="Sidebar menu">
+    <div class="text-center mb-4">
+      <% if (tenant.avatar_url) { %>
+       <img src="/uploads/<%= tenant.avatar_url %>" alt="Tenant Avatar" class="tenant-avatar" />
+      <% } else { %>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Tenant Avatar" class="tenant-avatar" />
+      <% } %>
+      
+      <h6 class="fw-bold"><%= tenant.first_name %></h6>
+      <p><strong>User ID:</strong> <%= tenant.id || 'N/A' %></p>
+    </div>
+     <nav class="nav flex-column">
+<nav class="nav flex-column" role="navigation">
+  <a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+  <a class="nav-link" href="/tenant/profile"><i class="bi bi-person-circle"></i> Profile</a>
+  <a class="nav-link" href="/tenant/history"><i class="bi bi-clock-history"></i> Rent History</a>
+  <a class="nav-link" href="/tenant/report-issue"><i class="bi bi-tools"></i> Maintenance</a>
+  <a class="nav-link active" href="/tenant/move-out"><i class="bi bi-box-arrow-up"></i> Move Out</a>
+  <a class="nav-link" href="/tenant/notification"><i class="bi bi-bell"></i> Notification</a>
+<a class="nav-link" href="/tenant/messaging"><i class="bi bi-chat-dots"></i> Messaging</a>
+</nav>
+  </aside>
+
+  <div id="sidebarBackdrop"></div>
+
+  <main class="main-content" tabindex="-1" role="main">
+    <div class="card shadow-sm p-4">
+      <div class="card-header d-flex align-items-center text-dark fw-semibold mb-4" style="border-radius: 1rem 1rem 0 0;">
+      <i class="bi bi-box-arrow-up me-2 fs-5"></i>
+        Move-Out Request
+      </div>
+
+      <p class="mb-4">Please fill out the form below to submit your move-out request.</p>
+
+      <% if (success) { %>
+        <div class="alert alert-success rounded-3"><%= success %></div>
+      <% } %>
+
+      <form action="/tenant/move-out" method="POST" novalidate>
+        <div class="mb-4">
+          <label for="room_number" class="form-label fw-semibold">Room Number</label>
+          <input type="text" class="form-control" id="room_number" name="room_number" value="<%= tenant.room_number %>" readonly />
+        </div>
+
+        <div class="mb-4">
+          <label for="reason" class="form-label fw-semibold">Reason for Moving Out</label>
+          <textarea class="form-control" id="reason" name="reason" rows="5" required><%= typeof reason !== 'undefined' ? reason : '' %></textarea>
+        </div>
+
+        <div class="form-actions d-flex justify-content-end">
+          <button type="submit" class="btn-submit">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+<script>
+const toggleBtn = document.getElementById('toggleSidebarDesktop');
+const desktopSidebar = document.getElementById('desktopSidebar');
+const backdrop = document.getElementById('sidebarBackdrop');
+
+function openSidebar() {
+  desktopSidebar.classList.add('open');
+  backdrop.classList.add('visible');
+  toggleBtn.setAttribute('aria-expanded', 'true');
+}
+
+function closeSidebar() {
+  desktopSidebar.classList.remove('open');
+  backdrop.classList.remove('visible');
+  toggleBtn.setAttribute('aria-expanded', 'false');
+}
+
+toggleBtn.addEventListener('click', () => {
+  desktopSidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+});
+backdrop.addEventListener('click', closeSidebar);
+
+const socket = io();
+const tenantId = "<%= tenant.id %>";
+const notificationDropdown = document.getElementById('notificationDropdown');
+const notificationCount = document.getElementById('notificationCount');
+
+let notifications = [];
+const MAX_AGE = 72 * 60 * 60 * 1000; // 72 hours
+
+if (localStorage.getItem('notifications')) {
+  const stored = JSON.parse(localStorage.getItem('notifications'));
+  const now = Date.now();
+  notifications = stored.filter(n => now - n.timestamp <= MAX_AGE);
+  notifications.forEach(n => addNotificationToDOM(n));
+  updateBadge();
+}
+
+function removeNotification(n, li) {
+  if (!li.parentElement) return;
+  li.remove();
+  notifications = notifications.filter(notif => notif.timestamp !== n.timestamp);
+  localStorage.setItem('notifications', JSON.stringify(notifications));
+  updateBadge();
+}
+
+function addNotificationToDOM(n) {
+  const li = document.createElement('li');
+  li.className = 'notification-item';
+  li.innerHTML = `${n.message} <span class="time">${new Date(n.timestamp).toLocaleTimeString()}</span>`;
+  li.addEventListener('click', () => removeNotification(n, li));
+  notificationDropdown.prepend(li);
+
+  const timeLeft = MAX_AGE - (Date.now() - n.timestamp);
+  if (timeLeft > 0) {
+    setTimeout(() => { if (li.parentElement) removeNotification(n, li); }, timeLeft);
+  }
+}
+
+function updateBadge() {
+  notificationCount.textContent = notifications.length;
+}
+
+socket.emit('joinTenantRoom', tenantId);
+socket.on('moveOutNotification', (data) => {
+  const newNotif = { message: data.message, timestamp: Date.now() };
+  notifications.push(newNotif);
+  localStorage.setItem('notifications', JSON.stringify(notifications));
+  addNotificationToDOM(newNotif);
+  updateBadge();
+});
+</script>
+</body>
+</html>

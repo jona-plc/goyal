@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GOYAL BOARDING HOUSE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f9f8f3;
+      padding-top: 70px;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 250px);
+  margin-left: 250px;
+  z-index: 1000;
+  background: whitesmoke;
+  box-shadow: 0 4px 10px rgba(199, 15, 15, 0.15);
+}
+
+.navbar-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4b2626 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar a.active {
+  background-color: #ffd700;
+  color: #000;
+  font-weight: 600;
+  border-radius: 5px;
+}
+.sidebar a:hover {
+  background-color: rgba(255, 215, 0, 0.3);
+  color: #000;
+}
+
+
+.custom-dropdown .dropdown-item:hover {
+  background: #b80707;
+  color: #fff;
+  transform: translateX(5px);
+}
+
+    .navbar .nav-link,
+    #darkModeToggle {
+      color: #302828 !important;
+      font-weight: 600;
+    }
+
+    #darkModeToggle:hover {
+      color: #b80707;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 250px;
+      background: linear-gradient( #000f06, #3d3f39b7, #0f1113d7);
+      padding-top: 90px;
+      color: #fff;
+      z-index: 1000;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px;
+      color: #f7f5f1;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      padding-left: 25px;
+      color: #000;
+    }
+  
+    .dark-mode {
+      background-color: #111;
+      color: #e1e1e1;
+    }
+
+    .dark-mode .navbar {
+      background: linear-gradient(45deg, #2c2c2c, #1a1a1a);
+    }
+
+    .dark-mode .sidebar {
+      background: #1c1c1c;
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a {
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a:hover {
+      background-color: #ffd700;
+      color: #000;
+    }
+
+    .dark-mode .card-summary {
+      background: linear-gradient(135deg, #444, #222);
+      color: #ffd700;
+    }
+
+    .dark-mode .navbar-brand {
+      color: #ffd700 !important;
+    }
+
+    .dark-mode #darkModeToggle {
+      color: #ffd700 !important;
+    }
+
+    .btn-danger {
+      background: linear-gradient(45deg, #b30000, #ff4d4d);
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(45deg, #ff4d4d, #ff6666);
+      box-shadow: 0 0 15px rgba(255,0,0,0.4);
+    }
+    .main-content {
+  position: fixed;
+  top: 70px;
+  left: 250px;
+  width: calc(100% - 250px);
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+  background-color: #f9f8f3;
+  padding: 20px 40px;
+  box-sizing: border-box;
+}
+.bg-light {
+    --bs-bg-opacity: 1;
+    background-color: rgb(203 203 203) !important;
+}
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 200px;
+        padding-top: 80px;
+      }
+
+      .navbar,
+      .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+      }
+
+      .sidebar a {
+        font-size: 1rem;
+        padding: 12px 16px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding-top: 0;
+      }
+
+      .navbar,
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+    .sidebar a.active {
+  background-color: #ffd700;
+  color: #000;
+  font-weight: 600;
+  border-radius: 5px;
+}
+.sidebar a:hover {
+  background-color: rgba(255, 215, 0, 0.3);
+  color: #000;
+}
+
+
+  </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <a href="/admin/dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+  <a href="/admin/financial-analytics"><i class="bi bi-bar-chart"></i> Financial Analytics</a>
+  <a href="/admin/create-tenant"><i class="bi bi-person"></i>Tenant Registration</a>
+  <a href="/admin/tenant-information"><i class="bi bi-person-gear"></i> Manage Tenants</a>
+  <a href="/admin/occupants"><i class="bi bi-collection"></i> Occupants</a>
+  <a href="/admin/payments"><i class="bi bi-credit-card-2-front"></i> Payment Transaction</a>
+  <a href="/admin/add-rooms"><i class="bi bi-door-open"></i> Manage Rooms</a>
+  <a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+</div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard"><i class="bi bi-speedometer2"></i> GOYAL PORTAL</a>
+      <div class="navbar-nav ms-auto">
+        <button id="darkModeToggle" onclick="toggleDarkMode()">
+          <span id="darkModeIcon" class="bi bi-sun"></span>
+        </button>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" data-bs-toggle="dropdown">
+            <i class="bi bi-grid"></i> Features
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="featuresDropdown">
+            <li><a class="dropdown-item" href="/admin/issue-tracking">Issue Tracking</a></li>
+            <li><a class="dropdown-item" href="/admin/move-out-requests">Move-Out Requests</a></li>
+            <li><a class="dropdown-item" href="/admin/announcements">Announcements</a></li>
+          </ul>
+        </li>
+        <a href="/admin/logout" class="btn btn-danger ms-2">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content" role="main" aria-label="Payment History">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">
+          <i class="bi bi-credit-card"></i> Payment History
+        </h5>
+        <p class="text-muted mb-4">
+          Review recent payments, filter by tenant or date, and manage payment status.
+        </p>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <input type="search" id="searchInput" class="form-control" placeholder="Search by tenant name..."
+              aria-label="Search payments by tenant name" />
+          </div>
+          <div class="col-md-6 text-end d-flex justify-content-end align-items-center gap-2">
+  
+<button class="btn btn-warning position-relative" id="unpaidBtn" title="View Overdue Tenants">
+  <i class="bi bi-bell-fill"></i>
+  <span id="unpaidCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+    0
+  </span>
+</button>
+<div id="unpaidPanel" class="card shadow-sm p-5 position-absolute" 
+     style="top: 90px; right: 20px; width: 700px; max-height: 500px; display: none; z-index: 1100;">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <strong>Overdue Tenants</strong>
+    <button class="btn btn-sm btn-outline-secondary" id="closeUnpaidPanel">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+  <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Tenant</th>
+          <th>Room</th>
+          <th>Amount (₱)</th>
+          <th>Status</th>
+          <th>Coverage</th>
+          <th>Overdue</th>
+        </tr>
+      </thead>
+      <tbody id="unpaidTableBody">
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-primary">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Tenant</th>
+                <th scope="col">Amount (₱)</th>
+                <th scope="col">Payment Date</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+         <tbody id="paymentsTableBody">
+  <% if (payments.length > 0) { %>
+    <% payments.forEach((p, index) => { %>
+      <tr>
+        <th scope="row"><%= index + 1 %></th>
+        <td><%= p.tenant_name %></td>
+        <td>₱<%= Number(p.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></td>
+        <td><%= new Date(p.payment_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) %></td>
+        <td class="d-flex align-items-center justify-content-between">
+          <% if (p.status === 'paid') { %>
+            <span class="badge bg-success">Paid</span>
+            <a href="/admin/generate-receipt/<%= p.id %>" class="btn btn-sm btn-outline-primary ms-2">
+              <i class="bi bi-receipt"></i> Proof of Payment
+            </a>
+          <% } else if (p.status === 'pending') { %>
+            <span class="badge bg-warning text-dark">Pending</span>
+          <% } else if (p.status === 'failed') { %>
+            <span class="badge bg-danger">Failed</span>
+          <% } else { %>
+            <span class="badge bg-secondary"><%= p.status %></span>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  <% } else { %>
+    <tr>
+      <td colspan="5" class="text-center text-muted">No payments found</td>
+    </tr>
+  <% } %>
+</tbody>
+
+
+
+        <nav aria-label="Page navigation" class="mt-3">
+          <ul id="pagination" class="pagination justify-content-center"></ul>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <script>
+window.addEventListener('DOMContentLoaded', () => {
+   const links = document.querySelectorAll('.sidebar a');
+  const currentPath = window.location.pathname;
+  links.forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+      link.classList.add('active');
+    }
+  });
+
+   const rowsPerPage = 6;
+  let currentPage = 1;
+
+  const tableBody = document.getElementById('paymentsTableBody');
+  let allRows = Array.from(tableBody.querySelectorAll('tr'));
+
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+    allRows.forEach(row => {
+      const tenantName = row.cells[1]?.textContent.toLowerCase() || '';
+      row.style.display = tenantName.includes(query) ? '' : 'none';
+    });
+    allRows = Array.from(tableBody.querySelectorAll('tr')).filter(row => row.style.display !== 'none');
+    currentPage = 1;
+    displayRows();
+    setupPagination();
+  });
+
+  function displayRows() {
+    allRows.forEach((row, index) => {
+      row.style.display = (index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage) ? '' : 'none';
+    });
+  }
+
+  function setupPagination() {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    const pageCount = Math.ceil(allRows.length / rowsPerPage);
+
+     const prevLi = document.createElement('li');
+    prevLi.className = 'page-item ' + (currentPage === 1 ? 'disabled' : '');
+    const prevLink = document.createElement('a');
+    prevLink.className = 'page-link';
+    prevLink.href = '#';
+    prevLink.innerText = 'Previous';
+    prevLink.addEventListener('click', e => {
+      e.preventDefault();
+      if (currentPage > 1) {
+        currentPage--;
+        displayRows();
+        setupPagination();
+      }
+    });
+    prevLi.appendChild(prevLink);
+    pagination.appendChild(prevLi);
+
+     for (let i = 1; i <= pageCount; i++) {
+      const li = document.createElement('li');
+      li.className = 'page-item' + (i === currentPage ? ' active' : '');
+      const link = document.createElement('a');
+      link.className = 'page-link';
+      link.href = '#';
+      link.innerText = i;
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        currentPage = i;
+        displayRows();
+        setupPagination();
+      });
+      li.appendChild(link);
+      pagination.appendChild(li);
+    }
+
+     const nextLi = document.createElement('li');
+    nextLi.className = 'page-item ' + (currentPage === pageCount ? 'disabled' : '');
+    const nextLink = document.createElement('a');
+    nextLink.className = 'page-link';
+    nextLink.href = '#';
+    nextLink.innerText = 'Next';
+    nextLink.addEventListener('click', e => {
+      e.preventDefault();
+      if (currentPage < pageCount) {
+        currentPage++;
+        displayRows();
+        setupPagination();
+      }
+    });
+    nextLi.appendChild(nextLink);
+    pagination.appendChild(nextLi);
+  }
+
+   allRows.forEach(row => row.style.display = 'none');
+  displayRows();
+  setupPagination();
+
+   const darkModeIcon = document.getElementById('darkModeIcon');
+  window.toggleDarkMode = function() {
+    document.body.classList.toggle('dark-mode');
+    if (document.body.classList.contains('dark-mode')) {
+      darkModeIcon.classList.remove('bi-sun');
+      darkModeIcon.classList.add('bi-moon');
+    } else {
+      darkModeIcon.classList.remove('bi-moon');
+      darkModeIcon.classList.add('bi-sun');
+    }
+  };
+  
+
+  async function fetchOverdueTenants() {
+  try {
+    const res = await fetch('/api/overdue-tenants');
+    const data = await res.json();
+    const overdueTenants = data.overdue || [];
+
+    const unpaidPanel = document.getElementById('unpaidPanel');
+    const unpaidTableBody = document.getElementById('unpaidTableBody');
+    const unpaidCountBadge = document.getElementById('unpaidCountBadge');
+
+    if (overdueTenants.length === 0) {
+      unpaidPanel.style.display = 'none';
+      unpaidCountBadge.textContent = '0';
+      return;
+    }
+
+    unpaidTableBody.innerHTML = '';
+
+    overdueTenants.forEach((t, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${t.tenant_name}</td>
+        <td>${t.room_number || '-'}</td>
+        <td>₱${parseFloat(t.amount).toFixed(2)}</td>
+        <td><span class="badge bg-danger">Overdue</span></td>
+        <td>${t.coverage_period}</td>
+        <td>${t.overdue_days} days</td>
+      `;
+      unpaidTableBody.appendChild(tr);
+    });
+
+    unpaidCountBadge.textContent = overdueTenants.length;
+  } catch (err) {
+    console.error('Error fetching overdue tenants:', err);
+  }
+}
+
+ document.getElementById('unpaidBtn').addEventListener('click', () => {
+  const panel = document.getElementById('unpaidPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+});
+
+ document.getElementById('closeUnpaidPanel').addEventListener('click', () => {
+  document.getElementById('unpaidPanel').style.display = 'none';
+});
+
+ fetchOverdueTenants();
+
+
+   setInterval(fetchOverdueTenants, 120000);
+});
+</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

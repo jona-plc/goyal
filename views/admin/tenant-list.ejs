@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GOYAL BOARDING HOUSE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+ body {
+      background-color: #f9f8f3;
+      padding-top: 70px;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+.sidebar a.active {
+  background-color: #ffd700;
+  color: #000;
+  font-weight: 600;
+  border-radius: 5px;
+}
+.sidebar a:hover {
+  background-color: rgba(255, 215, 0, 0.3);
+  color: #000;
+}
+
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 250px);
+  margin-left: 250px;
+  z-index: 1000;
+  background: whitesmoke;
+  box-shadow: 0 4px 10px rgba(199, 15, 15, 0.15);
+}
+
+.navbar-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4b2626 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+    
+    .navbar .nav-link,
+    #darkModeToggle {
+      color: #302828 !important;
+      font-weight: 600;
+    }
+
+    #darkModeToggle:hover {
+      color: #b80707;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 250px;
+      background: linear-gradient( #000f06, #3d3f39b7, #0f1113d7);
+      padding-top: 90px;
+      color: #fff;
+      z-index: 1000;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px;
+      color: #f7f5f1;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      padding-left: 25px;
+      color: #000;
+    }
+  /* Navbar */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 250px;
+    width: calc(100% - 250px);
+    z-index: 1000;
+    background: whitesmoke;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: background 0.3s;
+  }
+  .navbar .navbar-brand {
+    margin: 0 auto;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #4b2626 !important;
+  }
+
+  /* Chat Layout */
+  .main-content {
+    margin-left: 250px;
+    padding-top: 70px;
+    display: flex;
+    height: calc(100vh - 70px);
+  }
+
+  .tenant-list {
+    width: 300px;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+  }
+  .tenant-list h5 { padding: 15px; margin: 0; border-bottom: 1px solid #ddd; font-weight: bold; }
+  .tenant-item { padding: 12px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+  .tenant-item:hover { background: #f5f5f5; }
+  .tenant-item.active { background: #e7f1ff; }
+  .tenant-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc; }
+
+  .chat-window { flex: 1; display: flex; flex-direction: column; background: #e5ddd5; }
+  .chat-header { background: linear-gradient(90deg, #ff423c, #ffc107, #dc3545); color: #fff; padding: 15px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .chat-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #fff; }
+  .chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  .chat-input { display: flex; padding: 10px 15px; border-top: 1px solid #ddd; background: #fff; flex-shrink: 0; }
+  .chat-input input { flex: 1; padding: 10px 15px; border-radius: 25px; border: 1px solid #ccc; outline: none; }
+  .chat-input button { margin-left: 10px; border-radius: 25px; padding: 0 20px; background-color: #dc3545; border: none; color: #fff; }
+  .chat-input button:hover { background-color: #c82333; }
+
+  .message { max-width: 70%; padding: 10px 15px; border-radius: 20px; word-wrap: break-word; display: flex; flex-direction: column; }
+  .message .header { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+  .message .header img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; }
+  .message .sender-name { font-weight: bold; }
+  .message .message-text { word-wrap: break-word; }
+  .message .time { font-size: 10px; color: #666; margin-top: 5px; align-self: flex-end; }
+
+  .sent { background: #28a745; color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
+  .received { background: #fff; color: #000; align-self: flex-start; border-bottom-left-radius: 0; }
+
+  @media(max-width: 768px) {
+    .sidebar { width: 200px; }
+    .main-content { margin-left: 200px; }
+    .tenant-list { width: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <a href="/admin/dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+  <a href="/admin/financial-analytics"><i class="bi bi-bar-chart"></i> Financial Analytics</a>
+  <a href="/admin/create-tenant"><i class="bi bi-person"></i> Tenant Registration</a>
+  <a href="/admin/tenant-information"><i class="bi bi-person-gear"></i> Manage Tenants</a>
+  <a href="/admin/occupants"><i class="bi bi-collection"></i> Occupants</a>
+  <a href="/admin/payments"><i class="bi bi-credit-card-2-front"></i> Payment Transaction</a>
+  <a href="/admin/add-rooms"><i class="bi bi-door-open"></i> Manage Rooms</a>
+  <a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+</div>
+
+ <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/admin/dashboard"><i class="bi bi-speedometer2"></i> GOYAL PORTAL</a>
+    <div class="navbar-nav ms-auto">
+      <button id="darkModeToggle"><span id="darkModeIcon" class="bi bi-sun"></span></button>
+      <a href="/admin/logout" class="btn btn-danger ms-2"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+  </div>
+</nav>
+
+ <div class="main-content">
+  <div class="tenant-list">
+    <h5>Tenants</h5>
+    <% tenants.forEach(t => { %>
+      <div class="tenant-item" data-id="<%= t.id %>" data-avatar="<%= t.avatar_url %>" data-name="<%= t.first_name %> <%= t.last_name %>">
+        <img src="<%= t.avatar_url ? '/uploads/' + t.avatar_url : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' %>" class="tenant-avatar">
+        <div><%= t.first_name %> <%= t.last_name %></div>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="chat-window">
+    <div class="chat-header">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" id="tenantAvatar" alt="Tenant">
+      <div id="tenantName">Select a tenant</div>
+      <div id="typingIndicator"></div>
+    </div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="msgInput" placeholder="Type a message...">
+      <button id="sendBtn"><i class="bi bi-send-fill"></i></button>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+const socket = io();
+const adminId = "0";
+socket.emit('register', { userId: adminId, role: 'admin' });
+
+let currentTenantId = null;
+let currentTenantAvatar = null;
+
+const chatBox = document.getElementById('chatBox');
+const input = document.getElementById('msgInput');
+const btn = document.getElementById('sendBtn');
+const tenantNameEl = document.getElementById('tenantName');
+const tenantAvatarEl = document.getElementById('tenantAvatar');
+const typingIndicator = document.getElementById('typingIndicator');
+
+function formatTime() {
+  const d = new Date();
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+
+ async function loadMessages(tenantId) {
+  const res = await fetch(`/admin/chat-history/${tenantId}`);
+  const data = await res.json();
+  chatBox.innerHTML = '';
+  currentTenantAvatar = data.tenantAvatar ? `/uploads/${data.tenantAvatar}` : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+  tenantAvatarEl.src = currentTenantAvatar;
+
+  data.messages.forEach(msg => {
+    if(msg.sender_role === 'admin') {
+      chatBox.innerHTML += `
+      <div class="message sent">
+        <div class="header"><div class="sender-name">You</div></div>
+        <div class="message-text">${msg.message}</div>
+        <span class="time">${new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+      </div>`;
+    } else {
+      chatBox.innerHTML += `
+      <div class="message received">
+        <div class="header"><img src="${currentTenantAvatar}" alt="Tenant"><div class="sender-name">Tenant</div></div>
+        <div class="message-text">${msg.message}</div>
+        <span class="time">${new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+      </div>`;
+    }
+  });
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+ document.querySelectorAll('.tenant-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.tenant-item').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    currentTenantId = el.dataset.id;
+    tenantNameEl.textContent = el.dataset.name;
+    loadMessages(currentTenantId);
+  });
+});
+
+ btn.addEventListener('click', () => {
+  if (!currentTenantId) return;
+  const msg = input.value.trim();
+  if (!msg) return;
+  socket.emit('sendMessage', { senderId: adminId, receiverId: currentTenantId, message: msg, senderRole: 'admin' });
+  chatBox.innerHTML += `
+  <div class="message sent">
+    <div class="header"><div class="sender-name">You</div></div>
+    <div class="message-text">${msg}</div>
+    <span class="time">${formatTime()}</span>
+  </div>`;
+  input.value = '';
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+ input.addEventListener('input', () => {
+  if (!currentTenantId) return;
+  socket.emit('typing', { senderId: adminId, receiverId: currentTenantId });
+});
+
+ socket.on('receiveMessage', (data) => {
+  if (data.senderId != currentTenantId) return;
+  chatBox.innerHTML += `
+  <div class="message received">
+    <div class="header"><img src="${currentTenantAvatar}" alt="Tenant"><div class="sender-name">Tenant</div></div>
+    <div class="message-text">${data.message}</div>
+    <span class="time">${formatTime()}</span>
+  </div>`;
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+ socket.on('typing', (data) => {
+  if (data.senderId != currentTenantId) return;
+  typingIndicator.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
+  clearTimeout(typingIndicator.timeout);
+  typingIndicator.timeout = setTimeout(() => typingIndicator.innerHTML = '', 2000);
+});
+</script>
+</body>
+</html>

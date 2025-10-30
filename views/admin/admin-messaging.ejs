@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GOYAL BOARDING HOUSE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>body {
+      background-color: #f9f8f3;
+      padding-top: 70px;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+.sidebar a.active {
+  background-color: #ffd700;
+  color: #000;
+  font-weight: 600;
+  border-radius: 5px;
+}
+.sidebar a:hover {
+  background-color: rgba(255, 215, 0, 0.3);
+  color: #000;
+}
+
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 250px);
+  margin-left: 250px;
+  z-index: 1000;
+  background: whitesmoke;
+  box-shadow: 0 4px 10px rgba(199, 15, 15, 0.15);
+}
+
+.navbar-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4b2626 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+    
+    .navbar .nav-link,
+    #darkModeToggle {
+      color: #302828 !important;
+      font-weight: 600;
+    }
+
+    #darkModeToggle:hover {
+      color: #b80707;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 250px;
+      background: linear-gradient( #000f06, #3d3f39b7, #0f1113d7);
+      padding-top: 90px;
+      color: #fff;
+      z-index: 1000;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px;
+      color: #f7f5f1;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      padding-left: 25px;
+      color: #000;
+    }
+    
+.btn-light {
+  color: #333;
+  font-weight: 500;
+}
+
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      width: calc(100% - 250px);
+    }
+
+    .dark-mode {
+      background-color: #111;
+      color: #e1e1e1;
+    }
+
+    .dark-mode .navbar {
+      background: linear-gradient(45deg, #2c2c2c, #1a1a1a);
+    }
+
+    .dark-mode .sidebar {
+      background: #1c1c1c;
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a {
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a:hover {
+      background-color: #ffd700;
+      color: #000;
+    }
+
+    .dark-mode .card-summary {
+      background: linear-gradient(135deg, #444, #222);
+      color: #ffd700;
+    }
+
+    .dark-mode .navbar-brand {
+      color: #ffd700 !important;
+    }
+
+    .dark-mode #darkModeToggle {
+      color: #ffd700 !important;
+    }
+
+    .btn-danger {
+      background: linear-gradient(45deg, #b30000, #ff4d4d);
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(45deg, #ff4d4d, #ff6666);
+      box-shadow: 0 0 15px rgba(255,0,0,0.4);
+    }
+  .main-content {
+    margin-left: 250px;
+    padding-top: 5px;
+    display: flex;
+    height: calc(100vh - 70px);
+  }
+
+  .tenant-list {
+    width: 300px;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+  }
+  .tenant-list h5 { padding: 15px; margin: 0; border-bottom: 1px solid #ddd; font-weight: bold; }
+  .tenant-item { padding: 12px 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+  .tenant-item:hover { background: #f5f5f5; }
+  .tenant-item.active { background: #e7f1ff; }
+  .tenant-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc; }
+
+  .chat-window { flex: 1; display: flex; flex-direction: column; background: #e5ddd5; }
+  .chat-header { background: linear-gradient(90deg, #ff423c, #ffc107, #dc3545); color: #fff; padding: 15px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .chat-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #fff; }
+  .chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+  .chat-input { display: flex; padding: 10px 15px; border-top: 1px solid #ddd; background: #fff; flex-shrink: 0; }
+  .chat-input input { flex: 1; padding: 10px 15px; border-radius: 25px; border: 1px solid #ccc; outline: none; }
+  .chat-input button { margin-left: 10px; border-radius: 25px; padding: 0 20px; background-color: #dc3545; border: none; color: #fff; }
+  .chat-input button:hover { background-color: #c82333; }
+
+  .message { max-width: 70%; padding: 10px 15px; border-radius: 20px; word-wrap: break-word; display: flex; flex-direction: column; }
+  .message .header { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+  .message .header img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; }
+  .message .sender-name { font-weight: bold; }
+  .message .message-text { word-wrap: break-word; }
+  .message .time { font-size: 10px; color: #666; margin-top: 5px; align-self: flex-end; }
+
+  .sent { background: #28a745; color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
+  .received { background: #fff; color: #000; align-self: flex-start; border-bottom-left-radius: 0; }
+
+  @media(max-width: 768px) {
+    .sidebar { width: 200px; }
+    .main-content { margin-left: 200px; }
+    .tenant-list { width: 200px; }
+  }
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <a href="/admin/dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+  <a href="/admin/financial-analytics"><i class="bi bi-bar-chart"></i> Financial Analytics</a>
+  <a href="/admin/create-tenant"><i class="bi bi-person"></i>Tenant Registration</a>
+  <a href="/admin/tenant-information"><i class="bi bi-person-gear"></i> Manage Tenants</a>
+  <a href="/admin/occupants"><i class="bi bi-collection"></i> Occupants</a>
+  <a href="/admin/payments"><i class="bi bi-credit-card-2-front"></i> Payment Transaction</a>
+  <a href="/admin/add-rooms"><i class="bi bi-door-open"></i> Manage Rooms</a>
+  <a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+</div>
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard"><i class="bi bi-speedometer2"></i> GOYAL PORTAL</a>
+      <div class="navbar-nav ms-auto">
+        <button id="darkModeToggle" onclick="toggleDarkMode()">
+          <span id="darkModeIcon" class="bi bi-sun"></span>
+        </button>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" data-bs-toggle="dropdown">
+            <i class="bi bi-grid"></i> Features
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="featuresDropdown">
+            <li><a class="dropdown-item" href="/admin/issue-tracking">Issue Tracking</a></li>
+            <li><a class="dropdown-item" href="/admin/move-out-requests">Move-Out Requests</a></li>
+            <li><a class="dropdown-item" href="/admin/announcements">Announcements</a></li>
+          </ul>
+        </li>
+        <a href="/admin/logout" class="btn btn-danger ms-2">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+<div class="main-content">
+ <div class="tenant-list">
+  <h5>Tenants</h5>
+  <% tenants.forEach(t => { %>
+    <div class="tenant-item" 
+         data-id="<%= t.id %>" 
+         data-avatar="<%= t.avatar_url ? '/uploads/' + t.avatar_url : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' %>" 
+         data-name="<%= t.first_name %> <%= t.last_name %>">
+      <img src="<%= t.avatar_url ? '/uploads/' + t.avatar_url : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' %>" class="tenant-avatar">
+      <div><%= t.first_name %> <%= t.last_name %></div>
+    </div>
+  <% }) %>
+</div>
+
+
+  <div class="chat-window">
+    <div class="chat-header">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" id="tenantAvatar" alt="Tenant">
+      <div id="tenantName">Select a tenant</div>
+      <div id="typingIndicator"></div>
+    </div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="msgInput" placeholder="Type a message...">
+      <button id="sendBtn"><i class="bi bi-send-fill"></i></button>
+    </div>
+  </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const adminId = 0; 
+let currentTenantId = null;
+
+const chatBox = document.getElementById('chatBox');
+const input = document.getElementById('msgInput');
+const sendBtn = document.getElementById('sendBtn');
+const tenantNameEl = document.getElementById('tenantName');
+const tenantAvatarEl = document.getElementById('tenantAvatar');
+
+socket.emit('register', { userId: adminId, role: 'admin' });
+
+function appendMessage(message, senderRole, createdAt) {
+  const time = new Date(createdAt).toLocaleString();
+  const msgDiv = document.createElement('div');
+  msgDiv.classList.add('message', senderRole === 'admin' ? 'sent' : 'received');
+  msgDiv.innerHTML = `
+    <div class="message-text">${message}</div>
+    <small class="text-muted" style="font-size:10px;">${time}</small>
+  `;
+  chatBox.appendChild(msgDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+input.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendBtn.click();
+});
+
+socket.on('receiveMessage', (data) => {
+  const senderRole = data.senderRole || data.sender_role;
+  const createdAt = data.createdAt || data.created_at;
+
+  if (data.senderId == currentTenantId) {
+    appendMessage(data.message, senderRole, createdAt);
+  }
+});
+
+document.querySelectorAll('.tenant-item').forEach(el => {
+  el.addEventListener('click', async () => {
+    document.querySelectorAll('.tenant-item').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+
+    currentTenantId = el.dataset.id;
+    tenantNameEl.textContent = el.dataset.name;
+    tenantAvatarEl.src = el.dataset.avatar || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    chatBox.innerHTML = ''; 
+
+    socket.emit('joinRoom', { adminId, tenantId: currentTenantId });
+
+    try {
+      const res = await fetch(`/admin/chat-history/${currentTenantId}`);
+      const data = await res.json();
+      if (data.messages && Array.isArray(data.messages)) {
+        data.messages.forEach(msg => appendMessage(msg.message, msg.sender_role, msg.created_at));
+      } else if (Array.isArray(data)) {
+        data.forEach(msg => appendMessage(msg.message, msg.sender_role, msg.created_at));
+      }
+    } catch (err) {
+      console.error('Error loading chat history:', err);
+    }
+  });
+});
+
+sendBtn.addEventListener('click', () => {
+  if (!currentTenantId) return alert("Please select a tenant first!");
+  const message = input.value.trim();
+  if (!message) return;
+
+  const msgObj = {
+    senderId: adminId,
+    receiverId: currentTenantId,
+    message,
+    senderRole: 'admin',
+    createdAt: new Date()
+  };
+
+  socket.emit('sendMessage', msgObj);
+
+  appendMessage(message, 'admin', new Date());
+  input.value = '';
+});
+
+socket.on('joinRoom', ({ adminId, tenantId }) => {
+  const roomName = `room_${tenantId}`;
+  socket.join(roomName);
+});
+
+
+document.getElementById('darkModeToggle').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  document.querySelector('.sidebar').classList.toggle('dark-mode');
+  document.querySelector('.navbar').classList.toggle('dark-mode');
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const currentPath = window.location.pathname;
+  document.querySelectorAll(".sidebar a").forEach(link => {
+    if (link.getAttribute("href") === currentPath) {
+      link.classList.add("active");
+    }
+  });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

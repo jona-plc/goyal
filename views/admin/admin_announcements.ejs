@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GOYAL BOARDING HOUSE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f9f8f3;
+      padding-top: 70px;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 250px);
+  margin-left: 250px;
+  z-index: 1000;
+  background: whitesmoke;
+  box-shadow: 0 4px 10px rgba(199, 15, 15, 0.15);
+}
+
+.navbar-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4b2626 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar a.active {
+  background-color: #ffd700;
+  color: #000;
+  font-weight: 600;
+  border-radius: 5px;
+}
+.sidebar a:hover {
+  background-color: rgba(255, 215, 0, 0.3);
+  color: #000;
+}
+
+
+.custom-dropdown .dropdown-item:hover {
+  background: #b80707;
+  color: #fff;
+  transform: translateX(5px);
+}
+
+    .navbar .nav-link,
+    #darkModeToggle {
+      color: #302828 !important;
+      font-weight: 600;
+    }
+
+    #darkModeToggle:hover {
+      color: #b80707;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 250px;
+      background: linear-gradient( #000f06, #3d3f39b7, #0f1113d7);
+      padding-top: 90px;
+      color: #fff;
+      z-index: 1000;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px;
+      color: #f7f5f1;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      padding-left: 25px;
+      color: #000;
+    }
+  
+    .dark-mode {
+      background-color: #111;
+      color: #e1e1e1;
+    }
+
+    .dark-mode .navbar {
+      background: linear-gradient(45deg, #2c2c2c, #1a1a1a);
+    }
+
+    .dark-mode .sidebar {
+      background: #1c1c1c;
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a {
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a:hover {
+      background-color: #ffd700;
+      color: #000;
+    }
+
+    .dark-mode .card-summary {
+      background: linear-gradient(135deg, #444, #222);
+      color: #ffd700;
+    }
+
+    .dark-mode .navbar-brand {
+      color: #ffd700 !important;
+    }
+
+    .dark-mode #darkModeToggle {
+      color: #ffd700 !important;
+    }
+
+    .btn-danger {
+      background: linear-gradient(45deg, #b30000, #ff4d4d);
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(45deg, #ff4d4d, #ff6666);
+      box-shadow: 0 0 15px rgba(255,0,0,0.4);
+    }
+    .main-content {
+  position: fixed;
+  top: 70px;
+  left: 250px;
+  width: calc(100% - 250px);
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+  background-color: #f9f8f3;
+  padding: 20px 40px;
+  box-sizing: border-box;
+}
+.bg-light {
+    --bs-bg-opacity: 1;
+    background-color: rgb(203 203 203) !important;
+}
+    .table th {
+      font-weight: 600;
+      font-size: 0.95rem;
+      background-color: #cfe2ff;
+    }
+
+    .dark-mode .table th {
+      background-color: #444;
+      color: #ffd700;
+    }
+
+    .table td {
+      font-size: 0.92rem;
+      color: #555;
+    }
+    
+    .dark-mode .table td {
+      color: #e1e1e1;
+    }
+
+    .table td,
+    .table th {
+      padding: 12px 15px !important;
+      vertical-align: middle !important;
+    }
+
+    .table tbody tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    .dark-mode .table tbody tr:hover {
+      background-color: #555;
+    }
+
+    .badge {
+      font-size: 0.85rem;
+      padding: 6px 10px;
+      border-radius: 12px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .custom-dropdown .dropdown-item:hover {
+      background: #b80707;
+      color: #fff;
+      transform: translateX(5px);
+    }
+
+    form.d-flex.gap-1 {
+      align-items: center;
+    }
+
+    select.form-select-sm {
+      min-width: 120px;
+    }
+    @keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0; 
+}
+
+.animate-fade-in.delay-1 {
+  animation-delay: 0.3s;
+}
+
+.table-responsive {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.modal-content {
+  background-color: #fff !important;
+  color: #000 !important;
+  position: relative; 
+  z-index: 1055;
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+  background-color: #fff !important;
+  color: #000 !important;
+  position: relative; 
+  z-index: 1055;
+}
+
+.modal .btn-close {
+  filter: invert(0);
+  position: relative;
+  z-index: 1060; 
+  cursor: pointer;
+  pointer-events: auto; 
+}
+.modal-backdrop {
+  display: none !important;
+}
+
+.modal {
+  z-index: 5000 !important;
+  display: none;
+  opacity: 1 !important;
+  background-color: rgba(0, 0, 0, 0.15); 
+}
+
+.modal.show {
+  display: block !important;
+}
+
+.modal-dialog {
+  margin-top: 10vh;
+}
+
+.modal-content {
+  z-index: 6000 !important;
+  position: relative;
+}
+
+
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <a href="/admin/dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+  <a href="/admin/financial-analytics"><i class="bi bi-bar-chart"></i> Financial Analytics</a>
+  <a href="/admin/create-tenant"><i class="bi bi-person"></i>Tenant Registration</a>
+  <a href="/admin/tenant-information"><i class="bi bi-person-gear"></i> Manage Tenants</a>
+  <a href="/admin/occupants"><i class="bi bi-collection"></i> Occupants</a>
+  <a href="/admin/payments"><i class="bi bi-credit-card-2-front"></i> Payment Transaction</a>
+  <a href="/admin/add-rooms"><i class="bi bi-door-open"></i> Manage Rooms</a>
+  <a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+</div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard"><i class="bi bi-speedometer2"></i> GOYAL PORTAL</a>
+      <div class="navbar-nav ms-auto">
+        <button id="darkModeToggle" onclick="toggleDarkMode()">
+          <span id="darkModeIcon" class="bi bi-sun"></span>
+        </button>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" data-bs-toggle="dropdown">
+            <i class="bi bi-grid"></i> Features
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="featuresDropdown">
+            <li><a class="dropdown-item" href="/admin/issue-tracking">Issue Tracking</a></li>
+            <li><a class="dropdown-item" href="/admin/move-out-requests">Move-Out Requests</a></li>
+            <li><a class="dropdown-item" href="/admin/announcements">Announcements</a></li>
+          </ul>
+        </li>
+        <a href="/admin/logout" class="btn btn-danger ms-2">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      </div>
+    </div>
+   <main class="main-content">
+  <div class="card shadow-sm p-3 rounded mb-4">
+    <h5 class="mb-3 text-primary">Add Announcement</h5>
+    <form action="/admin/announcements/create" method="POST" class="d-flex flex-column gap-3">
+      <input type="text" name="title" placeholder="Title" required class="form-control" />
+      <textarea name="message" placeholder="Message" required class="form-control" rows="4"></textarea>
+      <button type="submit" class="btn btn-danger fw-semibold">
+        <i class="bi bi-plus-circle me-2"></i> Add Announcement
+      </button>
+    </form>
+  </div>
+
+  <% if (announcements.length === 0) { %>
+    <p>No announcements yet.</p>
+  <% } else { %>
+  <div class="table-responsive shadow-sm rounded">
+    <table class="table table-striped table-hover mb-0 align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>Title</th>
+          <th>Message</th>
+          <th>Date Created</th>
+          <th class="text-center" style="width: 140px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% announcements.forEach(announcement => { %>
+        <tr data-id="<%= announcement.id %>">
+          <td class="title"><strong><%= announcement.title %></strong></td>
+          <td class="message" style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" 
+              title="<%= announcement.message.replace(/"/g, '&quot;') %>">
+            <%= announcement.message %>
+          </td>
+          <td><%= new Date(announcement.created_at).toLocaleString() %></td>
+          <td class="text-center">
+            <button type="button" class="btn btn-sm btn-info me-1 btn-view" title="View Message">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-warning me-1 btn-edit" title="Edit Announcement">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-danger btn-delete" title="Delete Announcement">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <ul id="pagination" class="pagination justify-content-center mt-4"></ul>
+  <% } %>
+
+  <div class="modal fade" id="viewMessageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5>Edit Announcement</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="editForm">
+        <input type="hidden" id="edit-id">
+        <div class="mb-2">
+          <label>Title:</label>
+          <input type="text" id="edit-title" class="form-control" required>
+        </div>
+        <div class="mb-2">
+          <label>Message:</label>
+          <textarea id="edit-message" class="form-control" required></textarea>
+        </div>
+        <div class="text-end">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header">
+          <h5>Delete Announcement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this announcement?</p>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelDelete" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="confirmDelete" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-body text-center">
+        <h5 id="feedbackMessage" class="mb-3"></h5>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const table = document.querySelector("table");
+  if (!table) return;
+  document.querySelectorAll('[title]').forEach(el => new bootstrap.Tooltip(el));
+
+  const viewModal = new bootstrap.Modal(document.getElementById("viewMessageModal"));
+  const editModalEl = document.getElementById("editModal");
+  const editModal = new bootstrap.Modal(editModalEl, { backdrop: 'static', keyboard: false });
+  const deleteModalEl = document.getElementById("deleteModal");
+  const deleteModal = new bootstrap.Modal(deleteModalEl, { backdrop: 'static', keyboard: false });
+  const feedbackModalEl = document.getElementById("feedbackModal");
+  const feedbackModal = new bootstrap.Modal(feedbackModalEl);
+  const feedbackMessage = document.getElementById("feedbackMessage");
+
+  let rowToDelete = null;
+
+  const showFeedback = (msg) => {
+    feedbackMessage.textContent = msg;
+    feedbackModal.show();
+  };
+
+  table.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    const row = btn.closest("tr");
+    const id = row.dataset.id;
+
+    if (btn.classList.contains("btn-view")) {
+      const title = row.querySelector(".title").innerText.trim();
+      const messageCell = row.querySelector(".message");
+      const message = messageCell.getAttribute("title") || messageCell.innerText.trim();
+      const date = row.querySelector("td:nth-child(3)").innerText.trim();
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalBody").innerHTML = `<p>${message}</p><small class="text-muted">Created on: ${date}</small>`;
+      viewModal.show();
+    }
+
+    if (btn.classList.contains("btn-edit")) {
+      const titleCell = row.querySelector(".title");
+      const messageCell = row.querySelector(".message");
+      if (!titleCell || !messageCell) return showFeedback("Cannot edit this announcement.");
+
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-title').value = titleCell.innerText.trim();
+      document.getElementById('edit-message').value = messageCell.getAttribute("title") || messageCell.innerText.trim();
+      editModal.show();
+    }
+
+    if (btn.classList.contains("btn-delete")) {
+      rowToDelete = row;
+      deleteModal.show();
+    }
+  });
+
+  document.getElementById("confirmDelete").addEventListener("click", async () => {
+    if (!rowToDelete) return;
+    const id = rowToDelete.dataset.id;
+    try {
+      const res = await fetch(`/admin/announcements/delete/${id}`, { method: "DELETE" });
+      const result = await res.json();
+      if (result.success) {
+        rowToDelete.remove();
+        showFeedback("Announcement deleted successfully!");
+      } else {
+        showFeedback(result.error || "Failed to delete announcement.");
+      }
+    } catch (err) {
+      console.error(err);
+      showFeedback("Error deleting announcement.");
+    }
+    deleteModal.hide();
+    rowToDelete = null;
+  });
+
+  document.getElementById("editForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('edit-id').value;
+    const title = document.getElementById('edit-title').value.trim();
+    const message = document.getElementById('edit-message').value.trim();
+    if (!title || !message) return showFeedback("Title and message cannot be empty.");
+
+    try {
+      const res = await fetch(`/admin/announcements/edit/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, message })
+      });
+      const result = await res.json();
+      if (result.success) {
+        const row = document.querySelector(`tr[data-id='${id}']`);
+        row.querySelector(".title").innerText = title;
+        row.querySelector(".message").innerText = message;
+        row.querySelector(".message").setAttribute("title", message);
+        editModal.hide();
+        showFeedback("Announcement updated successfully!");
+      } else {
+        showFeedback(result.error || "Failed to update announcement.");
+      }
+    } catch (err) {
+      console.error(err);
+      showFeedback("Error updating announcement.");
+    }
+  });
+  document.getElementById("cancelDelete").addEventListener("click", () => deleteModal.hide());
+
+  const tableBody = table.querySelector("tbody");
+  const rows = Array.from(tableBody.querySelectorAll("tr"));
+  const rowsPerPage = 5;
+  const pagination = document.getElementById("pagination");
+
+  function displayPage(page) {
+    tableBody.innerHTML = "";
+    const start = (page - 1) * rowsPerPage;
+    rows.slice(start, start + rowsPerPage).forEach(r => tableBody.appendChild(r));
+    pagination.innerHTML = "";
+
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+    const createPageItem = (text, active = false, clickFn = null) => {
+      const li = document.createElement("li");
+      li.className = `page-item ${active ? "active" : ""}`;
+      li.innerHTML = `<a class="page-link" href="#">${text}</a>`;
+      if (clickFn) li.addEventListener("click", e => { e.preventDefault(); clickFn(); });
+      return li;
+    };
+
+    pagination.appendChild(createPageItem("«", false, () => page > 1 && displayPage(page - 1)));
+    for (let i = 1; i <= totalPages; i++)
+      pagination.appendChild(createPageItem(i, page === i, () => displayPage(i)));
+    pagination.appendChild(createPageItem("»", false, () => page < totalPages && displayPage(page + 1)));
+  }
+
+  if (rows.length > 0) displayPage(1);
+});
+
+</script>
+</body>
+</html>

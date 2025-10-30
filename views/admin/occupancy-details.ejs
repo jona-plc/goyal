@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GOYAL BOARDING HOUSE</title>
+
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f9f8f3;
+      padding-top: 70px;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 250px);
+  margin-left: 250px;
+  z-index: 1000;
+  background: whitesmoke;
+  box-shadow: 0 4px 10px rgba(199, 15, 15, 0.15);
+}
+
+ .navbar-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4b2626 !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-dropdown .dropdown-item:hover {
+  background: #b80707;
+  color: #fff;
+  transform: translateX(5px);
+}
+
+    .navbar .nav-link,
+    #darkModeToggle {
+      color: #302828 !important;
+      font-weight: 600;
+    }
+
+    #darkModeToggle:hover {
+      color: #b80707;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 250px;
+      background: linear-gradient( #000f06, #3d3f39b7, #0f1113d7);
+      padding-top: 90px;
+      color: #fff;
+      z-index: 1000;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px;
+      color: #f7f5f1;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      padding-left: 25px;
+      color: #000;
+    }
+  
+    .dark-mode {
+      background-color: #111;
+      color: #e1e1e1;
+    }
+
+    .dark-mode .navbar {
+      background: linear-gradient(45deg, #2c2c2c, #1a1a1a);
+    }
+
+    .dark-mode .sidebar {
+      background: #1c1c1c;
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a {
+      color: #fff;
+    }
+
+    .dark-mode .sidebar a:hover {
+      background-color: #ffd700;
+      color: #000;
+    }
+
+    .dark-mode .card-summary {
+      background: linear-gradient(135deg, #444, #222);
+      color: #ffd700;
+    }
+
+    .dark-mode .navbar-brand {
+      color: #ffd700 !important;
+    }
+
+    .dark-mode #darkModeToggle {
+      color: #ffd700 !important;
+    }
+
+    .btn-danger {
+      background: linear-gradient(45deg, #b30000, #ff4d4d);
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(45deg, #ff4d4d, #ff6666);
+      box-shadow: 0 0 15px rgba(255,0,0,0.4);
+    }
+     .main-content {
+      margin-left: 250px;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+     .card {
+      border-radius: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .section-title {
+      border-bottom: 2px solid #0d6efd;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      color: #0d6efd;
+      font-weight: 600;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #333;
+      display: inline-block;
+      width: 180px;
+    }
+
+     .badge-status-active { background-color: #198754; }
+    .badge-status-inactive { background-color: #6c757d; }
+    .payment-status-paid { color: #198754; font-weight: 600; }
+    .payment-status-pending { color: #fd7e14; font-weight: 600; }
+    .payment-status-overdue { color: #dc3545; font-weight: 600; }
+
+     #profilePreview {
+      border: 4px solid #d4c28e;
+      object-fit: cover;
+    }
+
+     .breadcrumb {
+      background: transparent;
+      padding-left: 0;
+      margin-bottom: 1.5rem;
+    }
+
+     @media (max-width: 768px) {
+      .navbar { left: 0; width: 100%; }
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 1rem; }
+      .info-label { width: 100%; margin-bottom: 0.25rem; }
+    }
+  </style>
+</head>
+<body>
+  
+<div class="sidebar">
+  <a href="/admin/dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
+  <a href="/admin/financial-analytics"><i class="bi bi-bar-chart"></i> Financial Analytics</a>
+  <a href="/admin/create-tenant"><i class="bi bi-person"></i>Tenant Registration</a>
+  <a href="/admin/tenant-information"><i class="bi bi-person-gear"></i> Manage Tenants</a>
+  <a href="/admin/occupants"><i class="bi bi-collection"></i> Occupants</a>
+  <a href="/admin/payments"><i class="bi bi-credit-card-2-front"></i> Payment Transaction</a>
+  <a href="/admin/add-rooms"><i class="bi bi-door-open"></i> Manage Rooms</a>
+  <a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+</div>
+
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard"><i class="bi bi-speedometer2"></i> GOYAL PORTAL</a>
+      <div class="navbar-nav ms-auto">
+        <button id="darkModeToggle" onclick="toggleDarkMode()">
+          <span id="darkModeIcon" class="bi bi-sun"></span>
+        </button>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" data-bs-toggle="dropdown">
+            <i class="bi bi-grid"></i> Features
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="featuresDropdown">
+            <li><a class="dropdown-item" href="/admin/issue-tracking">Issue Tracking</a></li>
+            <li><a class="dropdown-item" href="/admin/move-out-requests">Move-Out Requests</a></li>
+            <li><a class="dropdown-item" href="/admin/announcements">Announcements</a></li>
+          </ul>
+        </li>
+        <a href="/admin/logout" class="btn btn-danger ms-2">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+   <div class="main-content">
+     <div class="card mb-5 shadow-sm rounded-4">
+<div class="card-header bg-white text-dark fw-semibold d-flex align-items-center gap-2 rounded-top-4 border-bottom">
+      <i class="bi bi-info-circle fs-5"></i>
+        <span>Tenant Details</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-4">
+           <div class="col-md-4 d-flex flex-column align-items-center text-center">
+             <img
+  id="profilePreview"
+  src="<%= tenant.avatar_url ? '/uploads/' + tenant.avatar_url : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' %>"
+  alt="Tenant Avatar"
+  class="rounded-circle shadow"
+  style="width: 160px; height: 160px; object-fit: cover; border: 4px solid #d4c28e;"
+/>
+            <form action="/tenant/profile/upload-avatar" method="POST" enctype="multipart/form-data" class="w-100">
+              <input type="file" id="avatarInput" name="avatar" accept="image/*" class="form-control form-control-sm" required />
+              <button type="submit" class="btn btn-sm mt-2 w-100 fw-semibold upload-btn">Upload Picture</button>
+            </form>
+          </div>
+
+           <div class="col-md-8">
+            <h4 class="section-title">Personal Information</h4>
+            <p><span class="info-label">Full Name:</span> <%= tenant.first_name %> <%= tenant.middle_name || '' %> <%= tenant.last_name %></p>
+            <p><span class="info-label">Contact Number:</span> <%= tenant.contact_number || 'N/A' %></p>
+            <p><span class="info-label">Email:</span> <%= tenant.email || 'N/A' %></p>
+            <p><span class="info-label">Age:</span> <%= tenant.age || 'N/A' %></p>
+            <p><span class="info-label">Guardian Contact:</span> <%= tenant.guardian_contact_number || 'N/A' %></p>
+            <p><span class="info-label">Status:</span> 
+              <span class="badge <%= tenant.status.toLowerCase() === 'active' ? 'badge-status-active' : 'badge-status-inactive' %>">
+                <%= tenant.status %>
+              </span>
+            </p>
+<h4 class="section-title mt-4">Room Information</h4>
+<p><span class="info-label">Room:</span> <%= tenant.room_number || 'N/A' %></p>
+<p><span class="info-label">Bed Number:</span> <%= tenant.bed_number || 'N/A' %></p>
+<p><span class="info-label">Bed Position:</span> <%= tenant.bed_position || 'N/A' %></p>
+<p><span class="info-label">Move-in Date:</span> <%= tenant.start_lease ? new Date(tenant.start_lease).toLocaleDateString() : 'N/A' %></p>
+<p><span class="info-label">Monthly Rent:</span> ₱<%= tenant.monthly_rent ? Number(tenant.monthly_rent).toFixed(2) : 'N/A' %></p>
+<p><span class="info-label">Next Due Date:</span> <%= tenant.next_due_date ? new Date(tenant.next_due_date).toLocaleDateString() : 'N/A' %></p>
+<p><span class="info-label">Deposit:</span> ₱<%= tenant.deposit ? Number(tenant.deposit).toFixed(2) : '0.00' %></p>
+
+</div>
+</div>
+         <div class="mt-5">
+          <h4 class="section-title">Payment History</h4>
+          <% if (payments && payments.length > 0) { %>
+            <div class="accordion" id="paymentAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingPayments">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePayments">
+                    View Payments (<%= payments.length %>)
+                  </button>
+                </h2>
+                <div id="collapsePayments" class="accordion-collapse collapse show" data-bs-parent="#paymentAccordion">
+                  <div class="accordion-body table-responsive">
+                    <table class="table table-bordered table-hover">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Date</th>
+                          <th>Amount</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                   <tbody>
+  <% payments.forEach(payment => { %>
+    <tr>
+      <td>
+        <% if (payment.status.toLowerCase() === 'paid') { %>
+          <%= new Date(payment.payment_date).toLocaleDateString() %>
+        <% } else if (payment.status.toLowerCase() === 'upcoming') { %>
+          <%= new Date(payment.due_date).toLocaleDateString() %>
+        <% } %>
+      </td>
+      <td>₱<%= parseFloat(payment.amount).toFixed(2) %></td>
+      <td>
+        <% if (payment.status.toLowerCase() === 'paid') { %>
+          <i class="bi bi-check-circle-fill text-success"></i> <span class="payment-status-paid"><%= payment.status %></span>
+        <% } else if (payment.status.toLowerCase() === 'upcoming') { %>
+          <i class="bi bi-clock-fill text-warning"></i> <span class="payment-status-upcoming"><%= payment.status %></span>
+        <% } else { %>
+          <i class="bi bi-x-circle-fill text-danger"></i> <span class="payment-status-overdue"><%= payment.status %></span>
+        <% } %>
+      </td>
+    </tr>
+  <% }) %>
+</tbody>
+
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="alert alert-info mt-3">No payment history found for this tenant.</div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
