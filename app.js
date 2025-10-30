@@ -1836,18 +1836,19 @@ app.post('/tenant/pay-now/process', isTenant, async (req, res) => {
     const amount = rows[0].monthly_rent;
     const tenantName = `${rows[0].first_name} ${rows[0].last_name}`;
 
-    const params = {
-      externalId: `rent-${tenantId}-${month}-${Date.now()}`,
-      amount,
-      payerEmail: req.session.tenantEmail || 'example@email.com',
-      description: `Rent Payment (${method})`,
-     successRedirectUrl: 'http://localhost:3000/tenant/pay-now/success',
-      failureRedirectUrl: 'http://localhost:3000/tenant/pay-now/failure',
-      invoiceDuration: 86400,
-      shouldSendEmail: false,
-      currency: 'PHP',
-      paymentMethods: ['GCASH'],
-    };
+  const params = {
+  externalId: `rent-${tenantId}-${month}-${Date.now()}`,
+  amount,
+  payerEmail: req.session.tenantEmail || 'example@email.com',
+  description: `Rent Payment (${method})`,
+  successRedirectUrl: 'https://goyal-production-c47d.up.railway.app/tenant/pay-now/success',
+  failureRedirectUrl: 'https://goyal-production-c47d.up.railway.app/tenant/pay-now/failure',
+  invoiceDuration: 86400,
+  shouldSendEmail: false,
+  currency: 'PHP',
+  paymentMethods: ['GCASH'],
+};
+
 
     const inv = await invoice.createInvoice({ data: params });
     if (!inv.invoiceUrl) return res.status(500).send('Failed to create payment invoice.');
