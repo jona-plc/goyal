@@ -232,50 +232,76 @@
       </form>
     </div>
   </div>
-
-  <div class="card shadow-sm border-0">
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-bordered align-middle table-hover">
-          <thead class="table-light">
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Room Number</th>
+            <th>Type</th>
+            <th>Capacity</th>
+            <th>Assigned</th>
+            <th>Status</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rooms.forEach(room => { %>
             <tr>
-              <th>Room Number</th>
-              <th>Type</th>
-              <th>Capacity</th>
-              <th>Assigned</th>
-              <th>Status</th>
-              <th class="text-center">Actions</th>
+              <form action="/admin/add-rooms/<%= room.id %>/update" method="POST">
+                <td>
+                  <input 
+                    type="text" 
+                    name="room_number" 
+                    value="<%= room.room_number %>" 
+                    class="form-control form-control-sm" 
+                    required 
+                  />
+                </td>
+
+                <td>
+                  <select name="type" class="form-select form-select-sm" required>
+                    <option value="Single" <%= room.type === 'Single' ? 'selected' : '' %>>Single</option>
+                    <option value="Double" <%= room.type === 'Double' ? 'selected' : '' %>>Double</option>
+                    <option value="Double Deck" <%= room.type === 'Double Deck' ? 'selected' : '' %>>Double Deck</option>
+                  </select>
+                </td>
+
+                <td>
+                  <input 
+                    type="number" 
+                    name="capacity" 
+                    value="<%= room.capacity %>" 
+                    class="form-control form-control-sm" 
+                    min="1" 
+                    required 
+                  />
+                </td>
+
+                <td><%= room.tenant_count %> / <%= room.capacity %></td>
+
+                <td>
+                  <select name="status" class="form-select form-select-sm" required>
+                    <option value="Available" <%= room.status === 'Available' ? 'selected' : '' %>>Available</option>
+                    <option value="Occupied" <%= room.status === 'Occupied' ? 'selected' : '' %>>Occupied</option>
+                    <option value="Maintenance" <%= room.status === 'Maintenance' ? 'selected' : '' %>>Maintenance</option>
+                  </select>
+                </td>
+
+                <td class="text-center">
+                  <button type="submit" class="btn btn-success btn-sm px-3">Update</button>
+                </td>
+              </form> 
             </tr>
-          </thead>
-          <tbody>
-            <% rooms.forEach(room => { %>
-              <tr>
-                <form action="/admin/add-rooms/<%= room.id %>/update" method="POST">
-  <tr>
-    <td>
-      <input type="text" name="room_number" value="<%= room.room_number %>" class="form-control form-control-sm" required />
-    </td>
-    <td>
-      <select name="type" class="form-select form-select-sm" required>
-        <option value="Single" <%= room.type === 'Single' ? 'selected' : '' %>>Single</option>
-        <option value="Double" <%= room.type === 'Double' ? 'selected' : '' %>>Double</option>
-        <option value="Double Deck" <%= room.type === 'Double Deck' ? 'selected' : '' %>>Double Deck</option>
-      </select>
-    </td>
-    <td>
-      <input type="number" name="capacity" value="<%= room.capacity %>" class="form-control form-control-sm" min="1" required />
-    </td>
-    <td><%= room.tenant_count %> / <%= room.capacity %></td>
-    <td>
-      <select name="status" class="form-select form-select-sm" required>
-        <option value="Available" <%= room.status === 'Available' ? 'selected' : '' %>>Available</option>
-        <option value="Occupied" <%= room.status === 'Occupied' ? 'selected' : '' %>>Occupied</option>
-        <option value="Maintenance" <%= room.status === 'Maintenance' ? 'selected' : '' %>>Maintenance</option>
-      </select>
-    </td>
-    <td class="d-flex gap-1 justify-content-center">
-      <button type="submit" class="btn btn-success btn-sm px-3">Update</button>
-</form>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
 <button 
   class="btn btn-danger btn-sm px-3"
   data-bs-toggle="modal"

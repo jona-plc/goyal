@@ -334,19 +334,33 @@ app.post('/admin/add-rooms', async (req, res) => {
     res.redirect('/admin/add-rooms?status=error');
   }
 });
-
-
 app.post('/admin/add-rooms/:id/update', async (req, res) => {
   const { id } = req.params;
-  const { room_number, type, capacity, status } = req.body;
+  const { room_number, type, capacity, status } = req.body; 
+
   try {
     await pool.query(
       'UPDATE rooms SET room_number = ?, type = ?, capacity = ?, status = ? WHERE id = ?',
       [room_number, type, capacity, status, id]
     );
+
+    const [[{ tenant_count }]] = await pool.query(
+      'SELECT COUNT(*) AS tenant_count FROM tenants WHERE room_id = ?',
+      [id]
+    );
+
+    let finalStatus = status;
+
+    if (status !== 'Maintenance') {
+      finalStatus = tenant_count >= capacity ? 'Occupied' : 'Available';
+    }
+
+    await pool.query('UPDATE rooms SET status = ? WHERE id = ?', [finalStatus, id]);
+
+    console.log(`✅ Room ${room_number} updated successfully.`);
     res.redirect('/admin/add-rooms?status=updated');
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error updating room:', error);
     res.redirect('/admin/add-rooms?status=error');
   }
 });
@@ -701,7 +715,42 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
     return isNaN(d) ? null : d.toISOString().split('T')[0];
   };
 
+  const conn = await pool.getConnection();
   try {
+    await conn.beginTransaction();
+
+    // 🔹 Step 1: Kunin current room_id at bed_id ng tenant
+    const [[currentTenant]] = await conn.query(
+      'SELECT room_id, bed_id FROM tenants WHERE id = ?',
+      [tenantId]
+    );
+
+    // 🔹 Step 2: Gawing Available ang dating bed kung lilipat
+    if (currentTenant?.bed_id) {
+      await conn.query(
+        'UPDATE beds SET status = "Available" WHERE id = ?',
+        [currentTenant.bed_id]
+      );
+    }
+
+    // 🔹 Step 3: Kunin bagong room at bed ID
+    const [[roomData]] = await conn.query(
+      'SELECT id FROM rooms WHERE room_number = ?',
+      [room_number]
+    );
+
+    let room_id = roomData ? roomData.id : currentTenant?.room_id || null;
+    let bed_id = null;
+
+    if (room_id) {
+      const [[bedData]] = await conn.query(
+        'SELECT id FROM beds WHERE bed_number = ? AND room_id = ?',
+        [bed, room_id]
+      );
+      bed_id = bedData ? bedData.id : currentTenant?.bed_id || null;
+    }
+
+    // 🔹 Step 4: Format dates and other data
     const formattedStartLease = formatDate(start_lease);
     let finalNextDueDate = formatDate(next_due_date);
 
@@ -715,27 +764,7 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
     const parsedMonthlyRent = parseFloat(monthly_rent) || 0;
     const finalDeposit = parseFloat(deposit) || 0;
 
-    const [[currentTenant]] = await pool.query(
-      'SELECT room_id, bed_id FROM tenants WHERE id = ?',
-      [tenantId]
-    );
-
-    const [[roomData]] = await pool.query(
-      'SELECT id FROM rooms WHERE room_number = ?',
-      [room_number]
-    );
-
-    let room_id = roomData ? roomData.id : currentTenant?.room_id || null;
-    let bed_id = null;
-
-    if (room_id) {
-      const [[bedData]] = await pool.query(
-        'SELECT id FROM beds WHERE bed_number = ? AND room_id = ?',
-        [bed, room_id]
-      );
-      bed_id = bedData ? bedData.id : currentTenant?.bed_id || null;
-    }
-
+    // 🔹 Step 5: I-update ang tenant info
     let query = `
       UPDATE tenants SET
         first_name = ?, middle_name = ?, last_name = ?, address = ?, age = ?, year_level = ?, contact_number = ?,
@@ -744,7 +773,6 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
         guardian_first_name = ?, guardian_middle_name = ?, guardian_last_name = ?, guardian_contact_number = ?, guardian_address = ?,
         username = ?, email = ?, updated_at = NOW()
     `;
-
     const values = [
       first_name, middle_name || null, last_name, address, parsedAge, year_level, contact_number,
       formattedStartLease, finalNextDueDate, room_id, bed_id, room_number, bed,
@@ -761,22 +789,18 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
 
     query += ` WHERE id = ?`;
     values.push(tenantId);
+    await conn.query(query, values);
 
-    await pool.query(query, values);
+    // 🔹 Step 6: Mark new bed as Occupied
+    if (bed_id) {
+      await conn.query(
+        'UPDATE beds SET status = "Occupied" WHERE id = ?',
+        [bed_id]
+      );
+    }
 
-    await pool.query(`
-      UPDATE beds 
-      SET status = 'Available'
-      WHERE id NOT IN (SELECT bed_id FROM tenants WHERE bed_id IS NOT NULL)
-    `);
-
-    await pool.query(`
-      UPDATE beds 
-      SET status = 'Occupied'
-      WHERE id IN (SELECT bed_id FROM tenants WHERE bed_id IS NOT NULL)
-    `);
-
-    await pool.query(`
+    // 🔹 Step 7: Update room statuses
+    await conn.query(`
       UPDATE rooms 
       SET status = CASE 
         WHEN (SELECT COUNT(*) FROM beds WHERE room_id = rooms.id AND status = 'Occupied') >= capacity 
@@ -785,11 +809,16 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
       END
     `);
 
+    await conn.commit();
     console.log(`✅ Tenant ${tenantId} updated. Room ${room_number}, Bed ${bed}`);
     return res.redirect(`/admin/tenant-view/${tenantId}?success=Tenant+updated+successfully`);
+
   } catch (err) {
+    await conn.rollback();
     console.error('❌ Error updating tenant:', err);
     return res.redirect(`/admin/tenant-view/${tenantId}?error=Error+updating+tenant`);
+  } finally {
+    conn.release();
   }
 });
 
