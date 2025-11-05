@@ -57,30 +57,7 @@ function isTenant(req, res, next) {
   if (!req.session.tenantId) return res.redirect('/');
   next();
 }
-app.get('/', async (req, res) => {
-  try {
-    const ip = req.ip;
-    const ua = req.get('User-Agent');
 
-    const [result] = await pool.query(
-      'INSERT INTO visitors (type, ip_address, user_agent) VALUES (?, ?, ?)',
-      ['visit', ip, ua]
-    );
-
-     io.emit('new-visitor', {
-      id: result.insertId,
-      type: 'visit',
-      ip_address: ip,
-      user_agent: ua,
-      created_at: new Date()
-    });
-
-    res.render('index', { error: null });
-  } catch (err) {
-    console.error('Failed to log visitor:', err);
-    res.render('index', { error: null });
-  }
-});
 
 
 app.get('/login', (req, res) => {
@@ -133,35 +110,60 @@ app.get('/login', (req, res) => {
     res.redirect('/');
   });
 });
-app.post('/inquiry', async (req, res) => {
-  const { name, email, phone, title } = req.body;
-  const ip = req.ip;
-  const ua = req.get('User-Agent');
+// For logging inquiries
+app.post('/log-visitor', async (req, res) => {
+  const { type, name, email, phone, message } = req.body;
+  const ip_address = req.ip;
+  const user_agent = req.headers['user-agent'];
 
   try {
     const [result] = await pool.query(
-      'INSERT INTO visitors (name, email, phone, message, type, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name, email, phone, title, 'inquiry', ip, ua]
+      `INSERT INTO visitors (type, name, email, phone, message, ip_address, user_agent)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [type, name, email, phone, message, ip_address, user_agent]
     );
 
-    // Emit new inquiry to admin dashboard
-    io.emit('new-visitor', {
+    // Emit to admin live page
+    const visitor = {
       id: result.insertId,
-      name,
-      email,
-      phone,
-      message: title,
-      type: 'inquiry',
-      ip_address: ip,
-      user_agent: ua,
+      type, name, email, phone, message,
+      ip_address, user_agent,
       created_at: new Date()
-    });
+    };
+    io.emit('new-visitor', visitor);
 
-    res.json({ success: true, message: 'Inquiry sent' });
+    res.json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.json({ success: false, message: 'Failed to send inquiry' });
+    console.error('Failed to log visitor:', err);
+    res.json({ success: false });
   }
+});
+
+// For logging page visits
+app.get('/', async (req, res) => {
+  const ip_address = req.ip;
+  const user_agent = req.headers['user-agent'];
+
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO visitors (type, ip_address, user_agent)
+       VALUES ('visit', ?, ?)`,
+      [ip_address, user_agent]
+    );
+
+    const visitor = {
+      id: result.insertId,
+      type: 'visit',
+      ip_address, user_agent,
+      created_at: new Date()
+    };
+    io.emit('new-visitor', visitor);
+
+  } catch (err) {
+    console.error('Failed to log visitor:', err);
+  }
+
+  res.render('index', { error: null });
 });
 
 app.get('/admin/visitors', isAdmin, async (req, res) => {
