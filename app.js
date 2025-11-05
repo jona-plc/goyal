@@ -110,34 +110,35 @@ app.get('/login', (req, res) => {
     res.redirect('/');
   });
 });
-// For logging inquiries
-app.post('/log-visitor', async (req, res) => {
-  const { type, name, email, phone, message } = req.body;
-  const ip_address = req.ip;
-  const user_agent = req.headers['user-agent'];
 
+// Save visitor / inquiry
+app.post('/save-visitor', async (req, res) => {
   try {
+    const { name, email, phone, title, preferred_room } = req.body;
+    const type = 'inquiry'; // change to 'visit' if saving a visit
+    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
+    const user_agent = req.headers['user-agent'] || 'Unknown';
+
+    // Insert into DB (MySQL NOW() gives server time, +08:00 handled in pool)
     const [result] = await pool.query(
-      `INSERT INTO visitors (type, name, email, phone, message, ip_address, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [type, name, email, phone, message, ip_address, user_agent]
+      `INSERT INTO visitors (type, name, email, phone, title, preferred_room, ip_address, user_agent, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+      [type, name, email, phone, title, preferred_room, ip_address, user_agent]
     );
 
-    // Emit to admin live page
-    const visitor = {
-      id: result.insertId,
-      type, name, email, phone, message,
-      ip_address, user_agent,
-      created_at: new Date()
-    };
-    io.emit('new-visitor', visitor);
+    // Fetch newly inserted visitor/inquiry
+    const [visitor] = await pool.query(`SELECT * FROM visitors WHERE id = ?`, [result.insertId]);
 
-    res.json({ success: true });
+    // Emit to frontend
+    io.emit('new-visitor', visitor[0]);
+
+    res.status(200).json({ success: true, visitor: visitor[0] });
   } catch (err) {
-    console.error('Failed to log visitor:', err);
-    res.json({ success: false });
+    console.error('Error saving visitor:', err);
+    res.status(500).json({ error: 'Failed to save visitor' });
   }
 });
+
 
 // For logging page visits
 app.get('/', async (req, res) => {
@@ -168,14 +169,25 @@ app.get('/', async (req, res) => {
 
 app.get('/admin/visitors', isAdmin, async (req, res) => {
   try {
-    const [visitors] = await pool.query('SELECT * FROM visitors ORDER BY created_at DESC');
+    const { date } = req.query; // e.g., /admin/visitors?date=2025-11-05
+    let query = 'SELECT * FROM visitors WHERE type IN (?, ?)'; 
+    const params = ['inquiry', 'everyday visitor'];
+
+    if (date) {
+      query += ' AND DATE(created_at) = ?';
+      params.push(date);
+    }
+
+    query += ' ORDER BY created_at DESC';
+
+    const [visitors] = await pool.query(query, params);
+
     res.render('admin/visitors', { visitors });
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to fetch visitors');
   }
 });
-
 
 app.get('/admin/dashboard', isAdmin, async (req, res) => {
   try {

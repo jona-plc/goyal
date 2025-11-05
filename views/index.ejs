@@ -654,7 +654,6 @@ footer { padding:26px; text-align:center; color:#ddd; background:#000; margin-to
           
           <form id="inquiryForm">
             <input type="hidden" name="preferred_room" id="preferred_room" value="">
-
             <div class="mb-3">
               <input name="name" type="text" class="form-control" placeholder="Your full name" required>
             </div>
@@ -772,6 +771,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script>
+  document.getElementById('inquiryForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    const res = await fetch('/save-visitor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  });
+</script>
 
   <script>
      AOS.init({
@@ -815,7 +827,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         const cx = rect.width/2, cy = rect.height/2;
-        const dx = (x - cx) / cx; // -1 .. 1
+        const dx = (x - cx) / cx;  
         const dy = (y - cy) / cy;
         card.style.transform = `perspective(900px) rotateX(${(-dy*4).toFixed(2)}deg) rotateY(${(dx*5).toFixed(2)}deg) translateY(-6px)`;
       });
