@@ -324,7 +324,6 @@ app.post('/admin/add-rooms', async (req, res) => {
       [room_number, type, capacity, status]
     );
 
-    // Emit notification
     const newNotification = {
       heading: `New Room Added: ${room_number}`,
       content: `Room ${room_number} is now ${status}`,
@@ -345,19 +344,16 @@ app.post('/admin/add-rooms/:id/update', async (req, res) => {
     let { room_number, type, capacity } = req.body;
     capacity = parseInt(capacity);
 
-    // Update basic room info first
     await pool.query(
       'UPDATE rooms SET room_number = ?, type = ?, capacity = ? WHERE id = ?',
       [room_number, type, capacity, id]
     );
 
-    // Count tenants in this room
     const [[{ tenant_count }]] = await pool.query(
       'SELECT COUNT(*) AS tenant_count FROM tenants WHERE room_id = ?',
       [id]
     );
 
-    // Determine status
     let status;
     if (capacity === 0) {
       status = 'Maintenance';
@@ -365,7 +361,6 @@ app.post('/admin/add-rooms/:id/update', async (req, res) => {
       status = tenant_count >= capacity ? 'Occupied' : 'Available';
     }
 
-    // Update status
     await pool.query('UPDATE rooms SET status = ? WHERE id = ?', [status, id]);
 
     console.log(`✅ Room ${room_number} updated successfully.`);
@@ -594,6 +589,89 @@ app.get('/api/overdue-tenants', async (req, res) => {
   }
 });
 
+app.get('/api/tenants/unpaid', async (req, res) => {
+  try {
+    const month = req.query.month; // format: 'YYYY-MM'
+    
+    const [rows] = await pool.query(`
+      WITH RECURSIVE months AS (
+        SELECT t.id AS tenant_id,
+               t.start_lease,
+               DATE_FORMAT(t.start_lease, '%Y-%m-01') AS coverage_month
+        FROM tenants t
+        WHERE t.start_lease IS NOT NULL
+        UNION ALL
+        SELECT m.tenant_id,
+               m.start_lease,
+               DATE_ADD(m.coverage_month, INTERVAL 1 MONTH) AS coverage_month
+        FROM months m
+        WHERE DATE_ADD(m.coverage_month, INTERVAL 1 MONTH) <= CURDATE()
+      )
+      SELECT
+        t.id,
+        CONCAT(t.first_name, ' ', t.last_name) AS tenant_name,
+        r.room_number,
+        t.monthly_rent AS amount,
+        DATE_FORMAT(m.coverage_month, '%Y-%m-01') AS due_date
+      FROM tenants t
+      JOIN months m ON t.id = m.tenant_id
+      LEFT JOIN beds b ON t.bed_id = b.id
+      LEFT JOIN rooms r ON b.room_id = r.id
+      LEFT JOIN payments p
+        ON p.tenant_id = t.id
+        AND DATE_FORMAT(p.coverage_period, '%Y-%m') = DATE_FORMAT(m.coverage_month, '%Y-%m')
+      WHERE p.id IS NULL
+      ${month ? 'AND DATE_FORMAT(m.coverage_month, "%Y-%m") = ?' : ''}
+      ORDER BY t.id, m.coverage_month
+    `, month ? [month] : []);
+
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching unpaid tenants:', err);
+    res.status(500).json({ error: 'Failed to fetch unpaid tenants' });
+  }
+});
+
+
+// 🟢 Fetch UPCOMING tenants (next month)
+app.get('/api/tenants/upcoming', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      WITH RECURSIVE months AS (
+        SELECT DATE_FORMAT(start_lease, '%Y-%m-01') AS coverage_month, id AS tenant_id
+        FROM tenants
+        WHERE start_lease IS NOT NULL
+        UNION ALL
+        SELECT DATE_ADD(coverage_month, INTERVAL 1 MONTH), tenant_id
+        FROM months
+        WHERE DATE_ADD(coverage_month, INTERVAL 1 MONTH) <= (CURDATE() + INTERVAL 1 MONTH)
+      )
+      SELECT
+        t.id AS tenant_id,
+        CONCAT(t.first_name, ' ', t.last_name) AS tenant_name,
+        r.room_number,
+        t.monthly_rent AS amount,
+        'Upcoming' AS status,
+        DATE_FORMAT(m.coverage_month, '%Y-%m-%d') AS due_date
+      FROM tenants t
+      JOIN months m ON m.tenant_id = t.id
+      LEFT JOIN beds b ON t.bed_id = b.id
+      LEFT JOIN rooms r ON b.room_id = r.id
+      LEFT JOIN payments p
+        ON p.tenant_id = t.id
+        AND p.coverage_period = DATE_FORMAT(m.coverage_month, '%Y-%m')
+      WHERE 
+        MONTH(m.coverage_month) = MONTH(CURDATE() + INTERVAL 1 MONTH)
+        AND YEAR(m.coverage_month) = YEAR(CURDATE() + INTERVAL 1 MONTH)
+      ORDER BY m.coverage_month ASC;
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching upcoming tenants:', err);
+    res.status(500).json({ error: 'Failed to fetch upcoming tenants' });
+  }
+});
 
 app.get("/admin/occupants", async (req, res) => {
   try {

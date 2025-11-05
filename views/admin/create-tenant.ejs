@@ -249,7 +249,17 @@
             <input type="number" name="age" placeholder="Age" min="1" class="form-control" required />
           </div>
           <div class="col-md-4">
-            <input type="tel" name="contact_number" placeholder="Contact Number" class="form-control" required />
+            <input 
+  type="tel" 
+  name="contact_number" 
+  id="contact_number"
+  placeholder="Contact Number" 
+  class="form-control" 
+  maxlength="11"
+  pattern="[0-9]{11}" 
+  required 
+/>
+<small class="text-muted">*Must be 11 digits (numbers only)</small>
           </div>
 <h5>Rental Information</h5>
 
@@ -490,6 +500,29 @@ fetch("/admin/api/available-beds")
         resultModal.show();
       }
     });
+    document.getElementById('tenantForm').addEventListener('submit', function (event) {
+  const contactInput = document.getElementById('contact_number');
+  const contactValue = contactInput.value.trim();
+
+  // Check kung 11 digits lang at puro numbers
+  if (!/^\d{11}$/.test(contactValue)) {
+    event.preventDefault(); // Huwag i-submit
+    alert('Please enter a valid 11-digit contact number (numbers only).');
+    contactInput.focus();
+  }
+});
+// Limit input to numbers only and max 11 digits
+const contactInput = document.getElementById('contact_number');
+contactInput.addEventListener('input', function () {
+  // Remove any non-digit characters
+  this.value = this.value.replace(/\D/g, '');
+  
+  // Limit to 11 digits
+  if (this.value.length > 11) {
+    this.value = this.value.slice(0, 11);
+  }
+});
+
   </script>
 </body>
 </html>
