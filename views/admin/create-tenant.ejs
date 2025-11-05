@@ -26,8 +26,7 @@
   box-shadow: 0 4px 10px rgba(199, 15, 15, 0.15);
 }
 
-/* Center the GOYAL PORTAL text & icon */
-.navbar-brand {
+ .navbar-brand {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -190,7 +189,7 @@
   </style>
 </head>
 <body>
- 
+
 <div class="sidebar">
   <a href="/admin/dashboard"><i class="bi bi-house-door"></i> Dashboard</a>
   <a href="/admin/financial-analytics"><i class="bi bi-bar-chart"></i> Financial Analytics</a>
@@ -199,7 +198,8 @@
   <a href="/admin/occupants"><i class="bi bi-collection"></i> Occupants</a>
   <a href="/admin/payments"><i class="bi bi-credit-card-2-front"></i> Payment Transaction</a>
   <a href="/admin/add-rooms"><i class="bi bi-door-open"></i> Manage Rooms</a>
-  <a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+<a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+<a href="/admin/visitors"><i class="bi bi-people"></i> Visitors</a>
 </div>
 
 
@@ -380,8 +380,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // Automatically highlight active sidebar link
-  document.addEventListener("DOMContentLoaded", function () {
+   document.addEventListener("DOMContentLoaded", function () {
     const currentPath = window.location.pathname;
     const sidebarLinks = document.querySelectorAll('.sidebar a');
 
@@ -403,7 +402,7 @@ fetch("/admin/api/available-beds")
     return res.json();
   })
   .then(data => {
-    console.log('Fetched data:', data); // <-- Check this in browser console
+    console.log('Fetched data:', data); 
     roomData = data;
 
     data.forEach(room => {
@@ -417,18 +416,15 @@ fetch("/admin/api/available-beds")
     console.error('Fetch error:', err);
   });
 
-    // When room is selected, populate beds dropdown
-    roomSelect.addEventListener('change', function () {
+     roomSelect.addEventListener('change', function () {
       const selectedRoom = roomData.find(r => r.room_id == roomSelect.value);
 
-      // Clear previous bed options
-      bedSelect.innerHTML = `<option value="" disabled selected>Select Available Bed</option>`;
+       bedSelect.innerHTML = `<option value="" disabled selected>Select Available Bed</option>`;
 
-      // Populate bed options for selected room
-      if (selectedRoom && selectedRoom.beds.length > 0) {
+       if (selectedRoom && selectedRoom.beds.length > 0) {
         selectedRoom.beds.forEach(bed => {
           const option = document.createElement('option');
-          option.value = bed.bed_id; // Set bed_id as value for form submission
+          option.value = bed.bed_id;  
           option.textContent = `Bed ${bed.bed_number} - ${bed.bed_position}`;
           bedSelect.appendChild(option);
         });
@@ -504,21 +500,17 @@ fetch("/admin/api/available-beds")
   const contactInput = document.getElementById('contact_number');
   const contactValue = contactInput.value.trim();
 
-  // Check kung 11 digits lang at puro numbers
-  if (!/^\d{11}$/.test(contactValue)) {
-    event.preventDefault(); // Huwag i-submit
+   if (!/^\d{11}$/.test(contactValue)) {
+    event.preventDefault(); 
     alert('Please enter a valid 11-digit contact number (numbers only).');
     contactInput.focus();
   }
 });
-// Limit input to numbers only and max 11 digits
-const contactInput = document.getElementById('contact_number');
+ const contactInput = document.getElementById('contact_number');
 contactInput.addEventListener('input', function () {
-  // Remove any non-digit characters
-  this.value = this.value.replace(/\D/g, '');
+   this.value = this.value.replace(/\D/g, '');
   
-  // Limit to 11 digits
-  if (this.value.length > 11) {
+   if (this.value.length > 11) {
     this.value = this.value.slice(0, 11);
   }
 });

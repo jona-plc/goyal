@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Visitor Monitoring</title>
+  <link rel="stylesheet" href="/path-to-your-css/bootstrap.min.css">
+</head>
+<body>
+  <h1>Visitor & Inquiry Monitoring</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name / Email</th>
+        <th>Phone</th>
+        <th>Message</th>
+        <th>Type</th>
+        <th>IP Address</th>
+        <th>User Agent</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% visitors.forEach(v => { %>
+        <tr>
+          <td><%= v.id %></td>
+          <td><%= v.name || v.email %></td>
+          <td><%= v.phone %></td>
+          <td><%= v.message || '-' %></td>
+          <td><%= v.type %></td>
+          <td><%= v.ip_address %></td>
+          <td><%= v.user_agent %></td>
+          <td><%= v.created_at.toLocaleString() %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  socket.on('new-visitor', visitor => {
+    const table = document.querySelector('tbody');
+    const row = table.insertRow(0);  
+    row.innerHTML = `
+      <td>${visitor.id}</td>
+      <td>${visitor.name || visitor.email || '-'}</td>
+      <td>${visitor.phone || '-'}</td>
+      <td>${visitor.message || '-'}</td>
+      <td>${visitor.type}</td>
+      <td>${visitor.ip_address}</td>
+      <td>${visitor.user_agent}</td>
+      <td>${new Date(visitor.created_at).toLocaleString()}</td>
+    `;
+  });
+</script>
+
+</body>
+</html>

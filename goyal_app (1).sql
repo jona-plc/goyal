@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 30, 2025 at 02:29 PM
+-- Generation Time: Nov 05, 2025 at 10:37 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -34,17 +34,6 @@ CREATE TABLE `announcement` (
   `status` enum('active','inactive') DEFAULT 'active',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `announcement`
---
-
-INSERT INTO `announcement` (`id`, `title`, `description`, `status`, `created_at`) VALUES
-(1, 'power supply', 'mawawalan kuryente sa next week', '', '2025-05-31 00:14:21'),
-(2, 'dkdk', 'ksjd', '', '2025-05-31 00:28:22'),
-(3, 'ddd', 'dd', '', '2025-05-31 00:41:39'),
-(4, 'ksjd', 'jdjd', 'active', '2025-05-31 00:58:54'),
-(5, 'ss', 'ss', 'active', '2025-05-31 01:43:32');
 
 -- --------------------------------------------------------
 
@@ -248,104 +237,6 @@ CREATE TABLE `messages` (
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `messages`
---
-
-INSERT INTO `messages` (`id`, `sender_id`, `receiver_id`, `sender_role`, `message`, `created_at`) VALUES
-(1, 124, 0, 'tenant', 'v', '2025-10-29 12:09:54'),
-(2, 0, 124, 'admin', 'h', '2025-10-29 12:10:46'),
-(3, 0, 125, 'admin', 'hi', '2025-10-29 12:12:00'),
-(4, 0, 124, 'admin', 'huy', '2025-10-29 12:12:07'),
-(5, 124, 0, 'tenant', 'JONA', '2025-10-29 12:12:17'),
-(6, 0, 124, 'admin', 'ok', '2025-10-29 12:12:24'),
-(7, 0, 124, 'admin', 'huy', '2025-10-29 12:14:36'),
-(8, 124, 0, 'tenant', 'hi', '2025-10-29 12:15:33'),
-(9, 0, 124, 'admin', 'home', '2025-10-29 12:15:40'),
-(10, 124, 0, 'tenant', 'ok', '2025-10-29 12:15:48'),
-(11, 0, 124, 'admin', 'HOY', '2025-10-29 12:16:33'),
-(12, 124, 0, 'tenant', 'HAHAHAHAH', '2025-10-29 12:16:38'),
-(13, 0, 124, 'admin', 'BOANG', '2025-10-29 12:16:44'),
-(14, 124, 0, 'tenant', 'OK', '2025-10-29 12:16:49'),
-(15, 0, 124, 'admin', 'baby', '2025-10-29 12:20:43'),
-(16, 124, 0, 'tenant', 'yes baby', '2025-10-29 12:20:57'),
-(17, 0, 124, 'admin', 'baby', '2025-10-29 12:54:33'),
-(18, 124, 0, 'tenant', 'yes baby', '2025-10-29 12:54:39'),
-(19, 124, 0, 'tenant', 'hahaha', '2025-10-29 12:54:45'),
-(20, 0, 124, 'admin', 'boang', '2025-10-29 12:54:49'),
-(21, 0, 124, 'admin', 'hahahhhdhjjdjjdd', '2025-10-29 13:02:09'),
-(22, 124, 0, 'tenant', 'dhd', '2025-10-29 13:07:10'),
-(23, 0, 124, 'admin', 'hhhdhhdhd', '2025-10-29 13:07:15'),
-(24, 0, 124, 'admin', 'ha', '2025-10-29 13:07:21'),
-(25, 124, 0, 'tenant', 'hakdog', '2025-10-29 13:07:28'),
-(26, 0, 124, 'admin', 'jkfdskfkkjkjkjkdfddfjdjdfjfdjdfdf', '2025-10-29 13:14:53'),
-(27, 124, 0, 'tenant', 'ok', '2025-10-29 13:14:57'),
-(28, 124, 0, 'tenant', 'ddddddd', '2025-10-29 13:25:05'),
-(29, 0, 124, 'admin', 'ddddd', '2025-10-29 13:25:08'),
-(30, 124, 0, 'tenant', 'ddd', '2025-10-29 13:25:12'),
-(31, 0, 124, 'admin', 'ddddd', '2025-10-29 13:25:30'),
-(32, 124, 0, 'tenant', 'dddd', '2025-10-29 13:25:33'),
-(33, 0, 124, 'admin', 'hhhhh', '2025-10-29 13:38:02'),
-(34, 0, 124, 'admin', 'ccc', '2025-10-29 13:38:41'),
-(35, 0, 124, 'admin', 'xx', '2025-10-29 13:39:14'),
-(36, 0, 124, 'admin', 'ggg', '2025-10-29 13:42:11'),
-(37, 0, 124, 'admin', 'rr', '2025-10-29 13:42:11'),
-(38, 0, 124, 'admin', 'xx', '2025-10-29 13:43:28'),
-(39, 124, 0, 'tenant', 'xx', '2025-10-29 13:43:31'),
-(40, 124, 0, 'tenant', 'yes baby', '2025-10-29 13:46:37'),
-(41, 124, 0, 'tenant', 'kamusta', '2025-10-29 13:46:44'),
-(42, 0, 124, 'admin', 'okay lang', '2025-10-29 13:46:55'),
-(43, 124, 0, 'tenant', 'ha', '2025-10-29 13:51:06'),
-(44, 124, 0, 'tenant', 'okay', '2025-10-29 13:51:13'),
-(45, 0, 124, 'admin', 'baby', '2025-10-29 13:51:20'),
-(46, 0, 124, 'admin', 'sdhaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeewr', '2025-10-29 13:51:38'),
-(47, 124, 0, 'tenant', 'jkookskskkxoxododosososoososososposososoosos', '2025-10-29 13:52:51'),
-(48, 0, 124, 'admin', 'ncccccccccccccjerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrfffffffffffffffffffffffffffffffffffffskllllllllllllllllll', '2025-10-29 13:53:07'),
-(49, 124, 0, 'tenant', 'kalxociakxooxlxlxldlnanakalla ksloxocoosjwkwoowowowpwppwowlalkaksnnxnxncnbwkwkwopwpwpwppwocoic', '2025-10-29 13:53:58'),
-(50, 0, 124, 'admin', 'dfffffffffffffffffffssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssrettttttttttttttttttttttt', '2025-10-29 13:54:54'),
-(51, 124, 0, 'tenant', 'Text message examples include casual greetings like \"Hey! What are you up to?\", professional appointment reminders (e.g., \"Your interview with [Business Name] is scheduled for [Date] at [Time]\"), and sales promotions like \"Hi [Customer Name], thanks for signing up for exclusive promotional texts! To welcome you, here\'s a code for [DISCOUNT AMOUNT]% off your next purchase\". These examples can be categorized by purpose, such as social, professional, or business-related.', '2025-10-29 13:57:45'),
-(52, 0, 124, 'admin', 'Text message examples include casual greetings like \"Hey! What are you up to?\", professional appointment reminders (e.g., \"Your interview with [Business Name] is scheduled for [Date] at [Time]\"), and sales promotions like \"Hi [Customer Name], thanks for signing up for exclusive promotional texts! To welcome you, here\'s a code for [DISCOUNT AMOUNT]% off your next purchase\". These examples can be categorized by purpose, such as social, professional, or business-related.', '2025-10-29 13:57:57'),
-(53, 124, 0, 'tenant', 'ha okay', '2025-10-29 14:00:28'),
-(54, 0, 124, 'admin', 'ok', '2025-10-29 14:00:36'),
-(55, 124, 0, 'tenant', 'Text message examples include casual greetings like \"Hey! What are you up to?\", professional appointment reminders (e.g., \"Your interview with [Business Name] is scheduled for [Date] at [Time]\"), and sales promotions like \"Hi [Customer Name], thanks for signing up for exclusive promotional texts! To welcome you, here\'s a code for [DISCOUNT AMOUNT]% off your next purchase\". These examples can be categorized by purpose, such as social, professional, or business-related.', '2025-10-29 14:00:50'),
-(56, 0, 124, 'admin', 'Text message examples include casual greetings like \"Hey! What are you up to?\", professional appointment reminders (e.g., \"Your interview with [Business Name] is scheduled for [Date] at [Time]\"), and sales promotions like \"Hi [Customer Name], thanks for signing up for exclusive promotional texts! To welcome you, here\'s a code for [DISCOUNT AMOUNT]% off your next purchase\". These examples can be categorized by purpose, such as social, professional, or business-related.', '2025-10-29 14:01:01'),
-(57, 124, 0, 'tenant', 'Text message examples include casual greetings like \"Hey! What are you up to?\", professional appointment reminders (e.g., \"Your interview with [Business Name] is scheduled for [Date] at [Time]\"), and sales promotions like \"Hi [Customer Name], thanks for signing up for exclusive promotional texts! To welcome you, here\'s a code for [DISCOUNT AMOUNT]% off your next purchase\". These examples can be categorized by purpose, such as social, professional, or business-related.', '2025-10-29 14:03:04'),
-(58, 124, 0, 'tenant', 'ha', '2025-10-29 14:04:01'),
-(59, 124, 0, 'tenant', 'japxhs', '2025-10-29 14:04:05'),
-(60, 0, 124, 'admin', 'ha', '2025-10-29 14:04:39'),
-(61, 0, 124, 'admin', 'Just because you don\'t get a response immediately after sending a sweet text, try not to think the worst. Sometimes folks are just busy or maybe looking up articles like this to figure out the sweetest way to respond!', '2025-10-29 14:05:39'),
-(62, 124, 0, 'tenant', 'okay', '2025-10-29 14:05:57'),
-(63, 124, 0, 'tenant', 'hi baby', '2025-10-29 14:53:47'),
-(64, 0, 124, 'admin', 'hi\\', '2025-10-29 18:48:44'),
-(65, 124, 0, 'tenant', 'hi', '2025-10-29 20:43:45'),
-(66, 0, 124, 'admin', 'ha', '2025-10-29 20:43:51'),
-(67, 124, 0, 'tenant', 'ha', '2025-10-29 20:44:00'),
-(68, 0, 124, 'admin', 'j', '2025-10-29 20:44:07'),
-(69, 124, 0, 'tenant', 'ha', '2025-10-29 20:47:18'),
-(70, 0, 124, 'admin', 'ha', '2025-10-29 20:47:25'),
-(71, 124, 0, 'tenant', 'ha', '2025-10-29 20:48:06'),
-(72, 0, 124, 'admin', 'ok', '2025-10-29 20:48:16'),
-(73, 0, 124, 'admin', 'gj', '2025-10-29 20:52:59'),
-(74, 0, 124, 'admin', 'jj', '2025-10-29 20:54:48'),
-(75, 124, 0, 'tenant', 'bi', '2025-10-29 20:54:53'),
-(76, 124, 0, 'tenant', 'hi', '2025-10-29 20:59:39'),
-(77, 0, 124, 'admin', 'ha', '2025-10-29 20:59:50'),
-(78, 124, 0, 'tenant', 'okay', '2025-10-29 20:59:54'),
-(79, 0, 124, 'admin', 'hehe', '2025-10-29 21:00:00'),
-(80, 124, 0, 'tenant', 'ha', '2025-10-29 21:01:17'),
-(81, 0, 124, 'admin', 'ok', '2025-10-29 21:01:22'),
-(82, 124, 0, 'tenant', 'goodevening', '2025-10-29 21:25:48'),
-(83, 0, 124, 'admin', 'ha', '2025-10-29 21:34:56'),
-(84, 124, 0, 'tenant', 'hi', '2025-10-29 21:49:39'),
-(85, 0, 124, 'admin', 'hi', '2025-10-29 21:49:46'),
-(86, 0, 124, 'admin', 'hi baby', '2025-10-29 21:55:45'),
-(87, 124, 0, 'tenant', 'hi', '2025-10-29 21:55:49'),
-(88, 124, 0, 'tenant', 'ganda', '2025-10-29 21:55:52'),
-(89, 124, 0, 'tenant', 'f', '2025-10-29 22:48:01'),
-(90, 0, 124, 'admin', 'hi', '2025-10-29 23:21:25'),
-(91, 0, 124, 'admin', 'baby', '2025-10-29 23:22:19'),
-(92, 124, 0, 'tenant', 'yes', '2025-10-29 23:22:24');
-
 -- --------------------------------------------------------
 
 --
@@ -423,21 +314,6 @@ CREATE TABLE `payments` (
   `coverage_period` varchar(50) DEFAULT NULL,
   `tenant_name` varchar(150) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `payments`
---
-
-INSERT INTO `payments` (`id`, `tenant_id`, `amount`, `payment_date`, `status`, `payment_method`, `xendit_invoice_id`, `transaction_ref_url`, `coverage_period`, `tenant_name`) VALUES
-(427, 127, 1500.00, '2025-10-30 13:08:27', 'pending', 'GCASH', '6902f2cc08ee640873072775', 'https://checkout-staging.xendit.co/web/6902f2cc08ee640873072775', '2025-10', 'Jona Lagutin'),
-(428, 127, 1500.00, '2025-10-30 13:09:33', 'unpaid', NULL, NULL, NULL, '2025-11', 'Jona Lagutin'),
-(429, 127, 1500.00, '2025-10-30 13:09:39', 'pending', 'GCASH', '6902f3148a9cf659daaf1ec3', 'https://checkout-staging.xendit.co/web/6902f3148a9cf659daaf1ec3', '2025-10', 'Jona Lagutin'),
-(430, 127, 1500.00, '2025-10-30 13:12:16', 'unpaid', NULL, NULL, NULL, '2025-12', 'Jona Lagutin'),
-(431, 127, 1500.00, '2025-10-30 13:12:18', 'unpaid', NULL, NULL, NULL, '2026-01', 'Jona Lagutin'),
-(432, 127, 1500.00, '2025-10-30 13:12:26', 'unpaid', NULL, NULL, NULL, '2026-02', 'Jona Lagutin'),
-(433, 127, 1500.00, '2025-10-30 13:12:42', 'paid', 'GCASH', '6902f3bf8a9cf659daaf200a', 'https://checkout-staging.xendit.co/web/6902f3bf8a9cf659daaf200a', '2025-10', 'Jona Lagutin'),
-(434, 127, 1500.00, '2025-10-30 13:12:43', 'unpaid', NULL, NULL, NULL, '2026-03', 'Jona Lagutin'),
-(435, 127, 1500.00, '2025-10-30 13:13:17', 'unpaid', NULL, NULL, NULL, '2026-04', 'Jona Lagutin');
 
 -- --------------------------------------------------------
 
@@ -557,13 +433,6 @@ CREATE TABLE `tenants` (
   `bed_position` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tenants`
---
-
-INSERT INTO `tenants` (`id`, `first_name`, `middle_name`, `last_name`, `address`, `age`, `year_level`, `contact_number`, `start_lease`, `monthly_rent`, `next_due_date`, `status`, `guardian_first_name`, `guardian_middle_name`, `guardian_last_name`, `guardian_contact_number`, `guardian_address`, `username`, `email`, `password`, `is_active`, `created_at`, `updated_at`, `last_login`, `last_active`, `due_date`, `payment_status`, `avatar_url`, `room_id`, `rents_full_room`, `archived`, `bed_id`, `room_number`, `bed`, `deposit`, `is_student`, `school_name`, `work_place`, `work_position`, `bed_position`) VALUES
-(127, 'Jona', 'Palalcio', 'Lagutin', 'zone 8 bulan sorsogon', 22, '4th yr', '09560376568', '2025-10-01', 1500.00, '2025-11-01', 'Active', 'Imelda', 'Palacio', 'Lagutin', '09560376568', 'pantalan magallanes sorsogon', 'jonapalacio', 'jonapalacio06@gmail.com', '$2b$10$Uwxb1ooh5l7r2qIEHK2yvODgPkWqcmYz2LPu0Udv7CedC2lza/ywu', 1, '2025-10-30 05:05:11', '2025-10-30 05:13:17', '2025-10-30 13:12:15', '2025-10-30 13:13:17', NULL, 'Unpaid', NULL, 1, 0, 0, 122, NULL, NULL, 1500.00, 0, NULL, NULL, NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -593,6 +462,26 @@ CREATE TABLE `tenant_notifications` (
   `message` varchar(255) NOT NULL,
   `read_status` tinyint(4) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `visitors`
+--
+
+CREATE TABLE `visitors` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `message` text DEFAULT NULL,
+  `preferred_room` varchar(50) DEFAULT NULL,
+  `ip_address` varchar(50) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `page` varchar(255) DEFAULT NULL,
+  `visit_time` datetime DEFAULT current_timestamp(),
+  `type` enum('visit','inquiry') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -692,6 +581,12 @@ ALTER TABLE `tenant_notifications`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `visitors`
+--
+ALTER TABLE `visitors`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -777,6 +672,12 @@ ALTER TABLE `tenant_history`
 -- AUTO_INCREMENT for table `tenant_notifications`
 --
 ALTER TABLE `tenant_notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `visitors`
+--
+ALTER TABLE `visitors`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

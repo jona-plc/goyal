@@ -209,8 +209,7 @@
       background: linear-gradient(45deg, #ff4d4d, #ff6666);
       box-shadow: 0 0 15px rgba(255,0,0,0.4);
     }
-    /* Recent Payments Enhancements */
-.recent-activity-item {
+ .recent-activity-item {
   opacity: 0;
   transform: translateY(10px);
   transition: all 0.8s ease;
@@ -272,6 +271,9 @@
   <a href="/admin/payments"><i class="bi bi-credit-card-2-front"></i> Payment Transaction</a>
   <a href="/admin/add-rooms"><i class="bi bi-door-open"></i> Manage Rooms</a>
 <a href="/admin/messaging"><i class="bi bi-chat"></i> Messaging</a>
+<a href="/admin/visitors"><i class="bi bi-people"></i> Visitors</a>
+
+
 </div>
 
 
@@ -300,15 +302,13 @@
     </div>
   </nav>
   <main class="main-content container-fluid px-4">
-  <!-- PAGE HEADER -->
-  <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+   <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
     <button class="btn btn-outline-dark btn-sm" onclick="location.reload()">
       <i class="bi bi-arrow-clockwise"></i> Refresh
     </button>
   </div>
 
-  <!-- SUMMARY CARDS -->
-  <div class="row g-4 mb-4">
+   <div class="row g-4 mb-4">
     <div class="col-sm-6 col-lg-3">
       <div class="card card-summary blue">
         <div class="card-body">
@@ -347,8 +347,7 @@
     </div>
   </div>
 
-  <!-- CHART SECTION -->
-  <div class="card shadow-sm mb-5">
+   <div class="card shadow-sm mb-5">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
       <h6 class="mb-0 fw-semibold"><i class="bi bi-graph-up"></i> Monthly Income Trend</h6>
       <div>
@@ -359,8 +358,7 @@
       <canvas id="incomeChart" height="100"></canvas>
     </div>
   </div>
-  <!-- RECENT TENANT PAYMENTS -->
-<div class="card shadow-sm mb-4 live-card">
+ <div class="card shadow-sm mb-4 live-card">
   <div class="card-header d-flex align-items-center justify-content-between" 
        style="background: linear-gradient(90deg, #007bff, #00bfff); color: white;">
     <h6 class="mb-0 fw-semibold d-flex align-items-center gap-2">

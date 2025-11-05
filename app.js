@@ -57,10 +57,31 @@ function isTenant(req, res, next) {
   if (!req.session.tenantId) return res.redirect('/');
   next();
 }
+app.get('/', async (req, res) => {
+  try {
+    const ip = req.ip;
+    const ua = req.get('User-Agent');
 
- app.get('/', (req, res) => {
-  res.render('index', { error: null });
+    const [result] = await pool.query(
+      'INSERT INTO visitors (type, ip_address, user_agent) VALUES (?, ?, ?)',
+      ['visit', ip, ua]
+    );
+
+     io.emit('new-visitor', {
+      id: result.insertId,
+      type: 'visit',
+      ip_address: ip,
+      user_agent: ua,
+      created_at: new Date()
+    });
+
+    res.render('index', { error: null });
+  } catch (err) {
+    console.error('Failed to log visitor:', err);
+    res.render('index', { error: null });
+  }
 });
+
 
 app.get('/login', (req, res) => {
   res.render('login', { error: null });
@@ -112,6 +133,47 @@ app.get('/login', (req, res) => {
     res.redirect('/');
   });
 });
+app.post('/inquiry', async (req, res) => {
+  const { name, email, phone, title } = req.body;
+  const ip = req.ip;
+  const ua = req.get('User-Agent');
+
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO visitors (name, email, phone, message, type, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, email, phone, title, 'inquiry', ip, ua]
+    );
+
+    // Emit new inquiry to admin dashboard
+    io.emit('new-visitor', {
+      id: result.insertId,
+      name,
+      email,
+      phone,
+      message: title,
+      type: 'inquiry',
+      ip_address: ip,
+      user_agent: ua,
+      created_at: new Date()
+    });
+
+    res.json({ success: true, message: 'Inquiry sent' });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, message: 'Failed to send inquiry' });
+  }
+});
+
+app.get('/admin/visitors', isAdmin, async (req, res) => {
+  try {
+    const [visitors] = await pool.query('SELECT * FROM visitors ORDER BY created_at DESC');
+    res.render('admin/visitors', { visitors });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to fetch visitors');
+  }
+});
+
 
 app.get('/admin/dashboard', isAdmin, async (req, res) => {
   try {
@@ -317,7 +379,7 @@ app.post('/admin/add-rooms', async (req, res) => {
     let { room_number, type, capacity } = req.body;
     capacity = parseInt(capacity);
 
-    const status = capacity > 0 ? 'Available' : 'Maintenance'; // default status
+    const status = capacity > 0 ? 'Available' : 'Maintenance'; 
 
     const [result] = await pool.query(
       'INSERT INTO rooms (room_number, type, capacity, status) VALUES (?, ?, ?, ?)',
@@ -373,7 +435,7 @@ app.post('/admin/add-rooms/:id/update', async (req, res) => {
 app.post('/admin/add-rooms/:id/delete', async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM beds WHERE room_id = ?', [id]); // optional if using beds
+    await pool.query('DELETE FROM beds WHERE room_id = ?', [id]); 
     await pool.query('DELETE FROM rooms WHERE id = ?', [id]);
     res.redirect('/admin/add-rooms?status=deleted');
   } catch (error) {
@@ -591,7 +653,7 @@ app.get('/api/overdue-tenants', async (req, res) => {
 
 app.get('/api/tenants/unpaid', async (req, res) => {
   try {
-    const month = req.query.month; // format: 'YYYY-MM'
+    const month = req.query.month; 
     
     const [rows] = await pool.query(`
       WITH RECURSIVE months AS (
@@ -633,7 +695,6 @@ app.get('/api/tenants/unpaid', async (req, res) => {
 });
 
 
-// 🟢 Fetch UPCOMING tenants (next month)
 app.get('/api/tenants/upcoming', async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -676,22 +737,23 @@ app.get('/api/tenants/upcoming', async (req, res) => {
 app.get("/admin/occupants", async (req, res) => {
   try {
     const [results] = await pool.query(`
-      SELECT 
-        r.id AS room_id, 
-        r.room_number, 
-        r.type, 
-        r.status, 
-        r.capacity,
-        t.id AS tenant_id, 
-        CONCAT(t.first_name, ' ', t.last_name) AS tenant_name, 
-        t.avatar_url,
-        b.bed_number,
-        b.bed_position
-      FROM rooms r
-      LEFT JOIN tenants t ON r.id = t.room_id
-      LEFT JOIN beds b ON t.bed_id = b.id
-      ORDER BY r.room_number, b.bed_number
-    `);
+  SELECT 
+    r.id AS room_id, 
+    r.room_number, 
+    r.type, 
+    r.status, 
+    r.capacity,
+    t.id AS tenant_id, 
+    CONCAT(t.first_name, ' ', t.last_name) AS tenant_name, 
+    t.avatar_url,
+    b.bed_number,
+    b.bed_position
+  FROM rooms r
+  LEFT JOIN tenants t ON r.id = t.room_id AND t.is_active = 1
+  LEFT JOIN beds b ON t.bed_id = b.id
+  ORDER BY r.room_number, b.bed_number
+`);
+
 
     const rooms = {};
     results.forEach(row => {
