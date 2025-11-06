@@ -726,8 +726,7 @@ app.get('/api/tenants/upcoming', async (req, res) => {
         t.monthly_rent,
         r.room_number
       FROM tenants t
-      LEFT JOIN rooms r 
-        ON t.room_id = r.id
+      LEFT JOIN rooms r ON t.room_id = r.id
       WHERE 
         t.next_due_date > CURDATE()
         AND NOT EXISTS (
@@ -736,7 +735,14 @@ app.get('/api/tenants/upcoming', async (req, res) => {
           WHERE 
             p.tenant_id = t.id
             AND p.status = 'paid'
-            AND p.coverage_period >= DATE_FORMAT(t.next_due_date, '%Y-%m-01')
+            -- if coverage_period or coverage_end covers next_due_date or any future date
+            AND (
+              p.coverage_period >= DATE_SUB(t.next_due_date, INTERVAL 1 DAY)
+              OR (
+                p.coverage_end IS NOT NULL 
+                AND p.coverage_end >= t.next_due_date
+              )
+            )
         )
       ORDER BY t.next_due_date ASC
     `);
