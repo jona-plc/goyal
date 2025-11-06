@@ -248,100 +248,186 @@
       </div>
     </div>
   </nav>
-
- <main class="main-content">
+ 
+  <main class="main-content">
     <h1><i class="bi bi-person-lines-fill me-2"></i> Visitor Logs</h1>
 
-    <div class="filter-bar">
+    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
       <div>
         <label for="dateFilter" class="form-label mb-0 me-2 fw-semibold">Filter by Date:</label>
         <input type="date" id="dateFilter" class="form-control d-inline-block" style="width: 200px;">
+        <button id="resetFilter" class="btn btn-outline-secondary btn-sm ms-2">Reset</button>
       </div>
       <div class="text-end refresh-text">
-        Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
+  Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
+  &nbsp;
+  <!-- Inquiry Icon -->
+  <i id="inquiryIcon" class="bi bi-envelope-fill text-info position-relative" 
+   style="font-size: 1.8rem; cursor: pointer;" 
+   title="View Inquiries" 
+   data-bs-toggle="modal" 
+   data-bs-target="#inquiryModal">
+   <span id="inquiryBadge" 
+         class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+      0
+   </span>
+</i>
+
+<!-- Inquiry Modal -->
+<div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="inquiryModalLabel"><i class="bi bi-envelope-fill me-2"></i>Inquiries</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Message</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="inquiryTable">
+            <% visitors.filter(v => v.type === 'inquiry').forEach(v => { %>
+            <tr>
+              <td><%= v.id %></td>
+              <td><%= v.name || '-' %></td>
+              <td><%= v.email || '-' %></td>
+              <td><%= v.phone || '-' %></td>
+              <td><%= v.title || '-' %></td>
+              <td><%= new Date(v.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
       </div>
     </div>
-
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Message</th>
-            <th>Type</th>
-            <th>IP Address</th>
-            <th>User Agent</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody id="visitorTable">
-          <% if (visitors && visitors.length > 0) { %>
-            <% visitors.forEach(v => { %>
-              <tr>
-                <td><%= v.id %></td>
-                <td><%= v.name || '-' %></td>
-                <td><%= v.email || '-' %></td>
-                <td><%= v.phone || '-' %></td>
-                <td><%= v.title || '-' %></td>
-                <td>
-                  <span class="badge badge-type <%= v.type === 'inquiry' ? 'badge-inquiry' : 'badge-visitor' %>">
-                    <span class="badge badge-type ${visitor.type === 'inquiry' ? 'badge-inquiry' : 'badge-visit'}">${visitor.type}</span>
-
-                    <%= v.type %>
-                  </span>
-                </td>
-                <td><%= v.ip_address %></td>
-                <td><%= v.user_agent %></td>
-                <td><%= new Date(v.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></td>
-              </tr>
-            <% }) %>
-          <% } else { %>
-            <tr><td colspan="9" class="no-data">No visitor data available</td></tr>
-          <% } %>
-        </tbody>
-      </table>
-    </div>
   </div>
+</div>
 
-   <script src="/socket.io/socket.io.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Message</th>
+      <th>Type</th>
+      <th>IP Address</th>
+      <th>User Agent</th>
+      <th>Time</th>
+    </tr>
+  </thead>
+  <tbody id="visitorTable">
+    <% visitors.forEach(v => { %>
+      <tr data-date="<%= new Date(v.created_at).toISOString().split('T')[0] %>">
+        <td><%= v.id %></td>
+        <td><%= v.name || '-' %></td>
+        <td><%= v.email || '-' %></td>
+        <td><%= v.phone || '-' %></td>
+        <td><%= v.title || '-' %></td>
+        <td>
+          <span class="badge <%= v.type === 'inquiry' ? 'bg-info' : 'bg-success' %>"><%= v.type %></span>
+        </td>
+        <td><%= v.ip_address || '-' %></td>
+        <td><%= v.user_agent || '-' %></td>
+        <td><%= new Date(v.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+    </div>
+  </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script>
-  const socket = io();
-  const table = document.getElementById('visitorTable');
-  const dateFilter = document.getElementById('dateFilter');
+const socket = io();
+const tableBody = document.getElementById('visitorTable');
+const dateFilter = document.getElementById('dateFilter');
+const resetFilter = document.getElementById('resetFilter');
+const inquiryTable = document.getElementById('inquiryTable');
+const inquiryBadge = document.getElementById('inquiryBadge');
+const inquiryIcon = document.getElementById('inquiryIcon');
 
-  // Handle new visitors in real time
-  socket.on('new-visitor', visitor => {
-    const row = document.createElement('tr');
-    row.classList.add('highlight');
-    row.innerHTML = `
-      <td>${visitor.id}</td>
-      <td>${visitor.name || '-'}</td>
-      <td>${visitor.email || '-'}</td>
-      <td>${visitor.phone || '-'}</td>
-      <td>${visitor.title || '-'}</td>
-      <td><span class="badge badge-type ${visitor.type === 'inquiry' ? 'badge-inquiry' : 'badge-visitor'}">${visitor.type}</span></td>
-      <td>${visitor.ip_address}</td>
-      <td>${visitor.user_agent}</td>
-      <td>${new Date(visitor.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
+// Listen for new visitors
+socket.on("newVisitor", data => {
+  // Add to main visitor table
+  const newRow = document.createElement('tr');
+  newRow.setAttribute('data-date', new Date(data.created_at).toISOString().split('T')[0]);
+
+  newRow.innerHTML = `
+    <td>${data.id}</td>
+    <td>${data.name || '-'}</td>
+    <td>${data.email || '-'}</td>
+    <td>${data.phone || '-'}</td>
+    <td>${data.title || '-'}</td>
+    <td>
+      <span class="badge ${data.type === 'inquiry' ? 'bg-info' : 'bg-success'}">
+        ${data.type}
+      </span>
+    </td>
+    <td>${data.ip_address || '-'}</td>
+    <td>${data.user_agent || '-'}</td>
+    <td>${new Date(data.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
+  `;
+
+  tableBody.prepend(newRow);
+
+  // Apply date filter automatically if active
+  if (dateFilter.value) {
+    const rowDate = newRow.getAttribute('data-date');
+    newRow.style.display = rowDate === dateFilter.value ? '' : 'none';
+  }
+
+  // If the visitor is an inquiry, add to modal table and update badge
+  if (data.type === 'inquiry') {
+    const modalRow = document.createElement('tr');
+    modalRow.innerHTML = `
+      <td>${data.id}</td>
+      <td>${data.name || '-'}</td>
+      <td>${data.email || '-'}</td>
+      <td>${data.phone || '-'}</td>
+      <td>${data.title || '-'}</td>
+      <td>${new Date(data.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
     `;
-    table.prepend(row);
-  });
+    inquiryTable.prepend(modalRow);
 
-  // Date filter redirect
-  dateFilter.addEventListener('change', () => {
-    const selectedDate = dateFilter.value;
-    window.location.href = `?date=${selectedDate}`;
-  });
+    // Increment badge count
+    let count = parseInt(inquiryBadge.textContent) || 0;
+    inquiryBadge.textContent = count + 1;
+  }
+});
 
-  // Optional auto-refresh every 10 minutes
-  setInterval(() => location.reload(), 600000);
+// --- DATE FILTER ---
+dateFilter.addEventListener('change', () => {
+  const selectedDate = dateFilter.value;
+  const rows = document.querySelectorAll('#visitorTable tr');
+
+  rows.forEach(row => {
+    const rowDate = row.getAttribute('data-date');
+    row.style.display = (!selectedDate || rowDate === selectedDate) ? '' : 'none';
+  });
+});
+
+// --- RESET FILTER ---
+resetFilter.addEventListener('click', () => {
+  dateFilter.value = '';
+  const rows = document.querySelectorAll('#visitorTable tr');
+  rows.forEach(row => row.style.display = '');
+});
+
+// --- RESET INQUIRY BADGE ON CLICK ---
+inquiryIcon.addEventListener('click', () => {
+  inquiryBadge.textContent = 0;
+});
 </script>
-
 
 </body>
 </html>

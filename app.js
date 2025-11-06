@@ -111,73 +111,27 @@ app.get('/login', (req, res) => {
     res.redirect('/');
   });
 });
-
-app.post('/save-inquiry', async (req, res) => {
-  try {
-    const { name, email, phone, title, preferred_room } = req.body;
-    const type = 'inquiry';
-    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
-    const user_agent = req.headers['user-agent'] || 'Unknown';
-
-    const [result] = await pool.query(
-      `INSERT INTO visitors (type, name, email, phone, title, ip_address, user_agent, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-      [type, name, email, phone, title, preferred_room, ip_address, user_agent]
-    );
-
-    const [visitor] = await pool.query(`SELECT * FROM visitors WHERE id = ?`, [result.insertId]);
-    io.emit('new-visitor', visitor[0]);
-    res.status(200).json({ success: true, visitor: visitor[0] });
-  } catch (err) {
-    console.error('Error saving inquiry:', err);
-    res.status(500).json({ error: 'Failed to save inquiry' });
-  }
-});
-
-app.post('/save-visitor', async (req, res) => {
-  try {
-    const { name, email, phone, title, preferred_room } = req.body;
-    const type = 'visit'; // ✅ correct ENUM value
-    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
-    const user_agent = req.headers['user-agent'] || 'Unknown';
-
-    const [result] = await pool.query(
-      `INSERT INTO visitors (type, name, email, phone, title, preferred_room, ip_address, user_agent, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-      [type, name, email, phone, title, preferred_room, ip_address, user_agent]
-    );
-
-    const [visitor] = await pool.query(`SELECT * FROM visitors WHERE id = ?`, [result.insertId]);
-    io.emit('new-visitor', visitor[0]);
-    res.status(200).json({ success: true, visitor: visitor[0] });
-  } catch (err) {
-    console.error('Error saving visitor:', err);
-    res.status(500).json({ error: 'Failed to save visitor' });
-  }
-});
-
-
-
-
- app.get('/', async (req, res) => {
-  const ip_address = req.ip;
+// Automatically log visit on home page load
+app.get('/', async (req, res) => {
+  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const user_agent = req.headers['user-agent'];
 
   try {
     const [result] = await pool.query(
-      `INSERT INTO visitors (type, ip_address, user_agent)
-       VALUES ('visit', ?, ?)`,
+      `INSERT INTO visitors (type, ip_address, user_agent, created_at)
+       VALUES ('visit', ?, ?, NOW())`,
       [ip_address, user_agent]
     );
 
     const visitor = {
       id: result.insertId,
       type: 'visit',
-      ip_address, user_agent,
+      ip_address,
+      user_agent,
       created_at: new Date()
     };
-    io.emit('new-visitor', visitor);
 
+    io.emit('newVisitor', visitor); // emit live update (optional)
   } catch (err) {
     console.error('Failed to log visitor:', err);
   }
@@ -185,26 +139,66 @@ app.post('/save-visitor', async (req, res) => {
   res.render('index', { error: null });
 });
 
-app.get('/admin/visitors', isAdmin, async (req, res) => {
+// Visitor logs admin page
+app.get('/admin/visitors', async (req, res) => {
   try {
-    const { date } = req.query;  
-    let query = 'SELECT * FROM visitors WHERE type IN (?, ?)'; 
-    const params = ['inquiry', 'everyday visitor'];
-
-    if (date) {
-      query += ' AND DATE(created_at) = ?';
-      params.push(date);
-    }
-
-    query += ' ORDER BY created_at DESC';
-
-    const [visitors] = await pool.query(query, params);
-
-    res.render('admin/visitors', { visitors });
+    const [rows] = await pool.query(
+      'SELECT * FROM visitors ORDER BY created_at DESC'
+    );
+    res.render('admin/visitors', { visitors: rows });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Failed to fetch visitors');
+    console.error('Error fetching visitors:', err);
+    res.status(500).send('Database error.');
   }
+});
+app.post('/save-visitor', async (req, res) => {
+  try {
+    console.log('Request body:', req.body);
+    let { name, email, phone, title, preferred_room, type } = req.body;
+    console.log('Visitor type:', type);
+
+    type = type || 'inquiry';
+
+    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const user_agent = req.headers['user-agent'] || '';
+
+    const [result] = await pool.query(
+      `INSERT INTO visitors 
+      (type, name, email, phone, title, preferred_room, ip_address, user_agent) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [type, name || null, email || null, phone || null, title || null, preferred_room || null, ip_address, user_agent]
+    );
+
+    const [rows] = await pool.query('SELECT * FROM visitors WHERE id = ?', [result.insertId]);
+    const newVisitor = rows[0];
+
+    io.emit('newVisitor', newVisitor);
+
+    res.json({ success: true, visitor: newVisitor });
+  } catch (err) {
+    console.error('Failed to save visitor:', err);
+    res.status(500).json({ success: false, message: 'Failed to save visitor' });
+  }
+});
+
+
+
+// Socket.io connection
+io.on('connection', socket => {
+  console.log('Client connected');
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
+
+// -----------------------------
+// Socket.io connection
+// -----------------------------
+io.on("connection", socket => {
+  console.log("Client connected");
+  socket.on("disconnect", () => console.log("Client disconnected"));
 });
 
 app.get('/admin/dashboard', isAdmin, async (req, res) => {
@@ -1861,6 +1855,7 @@ app.post('/tenant/report-issue', isTenant, upload.single('issue_image'), async (
 
 
 const { Xendit } = require('xendit-node');
+const { Pool } = require('pg');
 
 const x = new Xendit({
   secretKey: 'xnd_development_cCsfvGIhtFOzbrRYPw7G1WDqjgHS6FNbbG36RNOw3G1GpJAq6gdSBfgFMxOMm',
