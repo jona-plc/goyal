@@ -259,7 +259,6 @@
   pattern="[0-9]{11}" 
   required 
 />
-<small class="text-muted">*Must be 11 digits (numbers only)</small>
           </div>
 <h5>Rental Information</h5>
 
@@ -335,8 +334,17 @@
           <div class="col-md-4">
             <input type="text" name="guardian_last_name" placeholder="Last Name" class="form-control" required />
           </div>
-          <div class="col-md-6">
-            <input type="tel" name="guardian_contact_number" placeholder="Contact Number" class="form-control" required />
+          <div class="col-md-4">
+           <input 
+  type="tel" 
+  name="guardian_contact_number" 
+  id="guardian_contact_number"
+  placeholder="Contact Number" 
+  class="form-control" 
+  maxlength="11"
+  pattern="[0-9]{11}" 
+  required 
+/>
           </div>
           <div class="col-md-6">
             <input type="text" name="guardian_address" placeholder="Address" class="form-control" required />
@@ -496,24 +504,32 @@ fetch("/admin/api/available-beds")
         resultModal.show();
       }
     });
-    document.getElementById('tenantForm').addEventListener('submit', function (event) {
-  const contactInput = document.getElementById('contact_number');
-  const contactValue = contactInput.value.trim();
 
-   if (!/^\d{11}$/.test(contactValue)) {
-    event.preventDefault(); 
-    alert('Please enter a valid 11-digit contact number (numbers only).');
-    contactInput.focus();
+    document.getElementById('tenantForm').addEventListener('submit', function (event) {
+   const contacts = [
+    {input: document.getElementById('contact_number'), label: 'Tenant'},
+    {input: document.getElementById('guardian_contact_number'), label: 'Guardian'}
+  ];
+
+  for (const c of contacts) {
+    const value = c.input.value.trim();
+    if (!/^\d{11}$/.test(value)) {
+      event.preventDefault(); 
+      alert(`Please enter a valid 11-digit contact number (numbers only) for ${c.label}.`);
+      c.input.focus();
+      return;  
+    }
   }
 });
- const contactInput = document.getElementById('contact_number');
-contactInput.addEventListener('input', function () {
-   this.value = this.value.replace(/\D/g, '');
-  
-   if (this.value.length > 11) {
-    this.value = this.value.slice(0, 11);
-  }
+
+ ['contact_number', 'guardian_contact_number'].forEach(id => {
+  const input = document.getElementById(id);
+  input.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, ''); 
+    if (this.value.length > 11) this.value = this.value.slice(0, 11); 
+  });
 });
+
 
   </script>
 </body>

@@ -261,8 +261,7 @@
       <div class="text-end refresh-text">
   Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
   &nbsp;
-  <!-- Inquiry Icon -->
-  <i id="inquiryIcon" class="bi bi-envelope-fill text-info position-relative" 
+   <i id="inquiryIcon" class="bi bi-envelope-fill text-info position-relative" 
    style="font-size: 1.8rem; cursor: pointer;" 
    title="View Inquiries" 
    data-bs-toggle="modal" 
@@ -273,8 +272,7 @@
    </span>
 </i>
 
-<!-- Inquiry Modal -->
-<div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+ <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
@@ -356,10 +354,8 @@ const inquiryTable = document.getElementById('inquiryTable');
 const inquiryBadge = document.getElementById('inquiryBadge');
 const inquiryIcon = document.getElementById('inquiryIcon');
 
-// Listen for new visitors
-socket.on("newVisitor", data => {
-  // Add to main visitor table
-  const newRow = document.createElement('tr');
+ socket.on("newVisitor", data => {
+   const newRow = document.createElement('tr');
   newRow.setAttribute('data-date', new Date(data.created_at).toISOString().split('T')[0]);
 
   newRow.innerHTML = `
@@ -380,14 +376,12 @@ socket.on("newVisitor", data => {
 
   tableBody.prepend(newRow);
 
-  // Apply date filter automatically if active
-  if (dateFilter.value) {
+   if (dateFilter.value) {
     const rowDate = newRow.getAttribute('data-date');
     newRow.style.display = rowDate === dateFilter.value ? '' : 'none';
   }
 
-  // If the visitor is an inquiry, add to modal table and update badge
-  if (data.type === 'inquiry') {
+   if (data.type === 'inquiry') {
     const modalRow = document.createElement('tr');
     modalRow.innerHTML = `
       <td>${data.id}</td>
@@ -399,14 +393,12 @@ socket.on("newVisitor", data => {
     `;
     inquiryTable.prepend(modalRow);
 
-    // Increment badge count
-    let count = parseInt(inquiryBadge.textContent) || 0;
+     let count = parseInt(inquiryBadge.textContent) || 0;
     inquiryBadge.textContent = count + 1;
   }
 });
 
-// --- DATE FILTER ---
-dateFilter.addEventListener('change', () => {
+ dateFilter.addEventListener('change', () => {
   const selectedDate = dateFilter.value;
   const rows = document.querySelectorAll('#visitorTable tr');
 
@@ -416,15 +408,13 @@ dateFilter.addEventListener('change', () => {
   });
 });
 
-// --- RESET FILTER ---
-resetFilter.addEventListener('click', () => {
+ resetFilter.addEventListener('click', () => {
   dateFilter.value = '';
   const rows = document.querySelectorAll('#visitorTable tr');
   rows.forEach(row => row.style.display = '');
 });
 
-// --- RESET INQUIRY BADGE ON CLICK ---
-inquiryIcon.addEventListener('click', () => {
+ inquiryIcon.addEventListener('click', () => {
   inquiryBadge.textContent = 0;
 });
 </script>
