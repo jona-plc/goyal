@@ -727,9 +727,12 @@ app.get('/api/tenants/upcoming', async (req, res) => {
         r.room_number
       FROM tenants t
       LEFT JOIN payments p 
-        ON t.id = p.tenant_id AND p.status = 'paid'
+        ON t.id = p.tenant_id 
+        AND p.status = 'paid' 
+        AND DATE(p.coverage_period) = DATE(t.next_due_date)  -- check kung may bayad na para sa due date
       LEFT JOIN rooms r ON t.room_id = r.id
-      WHERE t.next_due_date > CURDATE()
+      WHERE t.next_due_date > CURDATE() 
+        AND p.id IS NULL  -- exclude tenants na nakapagbayad na
     `);
 
     const formatted = rows.map(t => ({
@@ -748,6 +751,7 @@ app.get('/api/tenants/upcoming', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 
 
