@@ -726,22 +726,24 @@ app.get('/api/tenants/upcoming', async (req, res) => {
         t.monthly_rent,
         r.room_number
       FROM tenants t
-      LEFT JOIN payments p 
-        ON t.id = p.tenant_id
-        AND p.status = 'paid'
-        AND (
-          (
-            MONTH(p.coverage_period) = MONTH(t.next_due_date)
-            AND YEAR(p.coverage_period) = YEAR(t.next_due_date)
-          )
-          OR (
-            p.coverage_period > t.next_due_date
-          )
-        )
-      LEFT JOIN rooms r ON t.room_id = r.id
+      LEFT JOIN rooms r 
+        ON t.room_id = r.id
       WHERE 
         t.next_due_date > CURDATE()
-        AND p.id IS NULL
+        AND NOT EXISTS (
+          SELECT 1 
+          FROM payments p
+          WHERE 
+            p.tenant_id = t.id
+            AND p.status = 'paid'
+            AND (
+              -- Paid for the upcoming coverage month
+              (YEAR(p.coverage_period) = YEAR(t.next_due_date)
+               AND MONTH(p.coverage_period) = MONTH(t.next_due_date))
+              -- Or advance payment that covers a later month
+              OR (p.coverage_period > t.next_due_date)
+            )
+        )
       ORDER BY t.next_due_date ASC
     `);
 
