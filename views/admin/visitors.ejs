@@ -288,6 +288,8 @@
                 <td><%= v.title || '-' %></td>
                 <td>
                   <span class="badge badge-type <%= v.type === 'inquiry' ? 'badge-inquiry' : 'badge-visitor' %>">
+                    <span class="badge badge-type ${visitor.type === 'inquiry' ? 'badge-inquiry' : 'badge-visit'}">${visitor.type}</span>
+
                     <%= v.type %>
                   </span>
                 </td>
@@ -306,33 +308,13 @@
 
    <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
   const socket = io();
   const table = document.getElementById('visitorTable');
   const dateFilter = document.getElementById('dateFilter');
 
-  // Function to remove "visitor" rows between 2–5 hours after creation
-  function scheduleAutoRemove(row, createdAt, type) {
-    if (type !== 'visitor') return; // only visitors auto-disappear
-
-    const now = new Date();
-    const createdTime = new Date(createdAt);
-    const diff = now - createdTime;
-
-    // Randomize between 2 and 5 hours (in ms)
-    const removeAfter = Math.floor(7200000 + Math.random() * (10800000 - 7200000));
-
-    const remainingTime = removeAfter - diff;
-    if (remainingTime > 0) {
-      setTimeout(() => row.remove(), remainingTime);
-    } else {
-      row.remove();
-    }
-  }
-
+  // Handle new visitors in real time
   socket.on('new-visitor', visitor => {
     const row = document.createElement('tr');
     row.classList.add('highlight');
@@ -348,30 +330,18 @@
       <td>${new Date(visitor.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
     `;
     table.prepend(row);
-    scheduleAutoRemove(row, visitor.created_at, visitor.type);
   });
 
+  // Date filter redirect
   dateFilter.addEventListener('change', () => {
     const selectedDate = dateFilter.value;
     window.location.href = `?date=${selectedDate}`;
   });
 
-  // Schedule removal for existing visitor rows on page load
-  document.querySelectorAll('#visitorTable tr').forEach(tr => {
-    const typeCell = tr.cells[5];
-    const timeCell = tr.cells[8];
-    if (!typeCell || !timeCell) return;
-
-    const type = typeCell.textContent.trim().toLowerCase();
-    const timeValue = timeCell.textContent.trim();
-    if (timeValue) {
-      scheduleAutoRemove(tr, timeValue, type);
-    }
-  });
-
   // Optional auto-refresh every 10 minutes
   setInterval(() => location.reload(), 600000);
 </script>
+
 
 </body>
 </html>

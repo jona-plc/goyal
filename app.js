@@ -7,7 +7,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const multer = require('multer');
-const cron = require('node-cron');  
 
 const app = express();
 const server = http.createServer(app);
@@ -48,21 +47,6 @@ app.set('views', './views');
   next();
 });
 
- cron.schedule('*/30 * * * *', async () => {
-  try {
-    console.log('🧹 Running visitor cleanup task...');
-    const [deleted] = await pool.query(`
-      DELETE FROM visitors 
-      WHERE type = 'visitor'
-      AND created_at < NOW() - INTERVAL 5 HOUR
-    `);
-    if (deleted.affectedRows > 0) {
-      console.log(`🗑️ Deleted ${deleted.affectedRows} old visitor records.`);
-    }
-  } catch (err) {
-    console.error('❌ Error cleaning up visitors:', err);
-  }
-});
 
 
  function isAdmin(req, res, next) {
@@ -136,7 +120,7 @@ app.post('/save-inquiry', async (req, res) => {
     const user_agent = req.headers['user-agent'] || 'Unknown';
 
     const [result] = await pool.query(
-      `INSERT INTO visitors (type, name, email, phone, title, preferred_room, ip_address, user_agent, created_at)
+      `INSERT INTO visitors (type, name, email, phone, title, ip_address, user_agent, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
       [type, name, email, phone, title, preferred_room, ip_address, user_agent]
     );
@@ -153,7 +137,7 @@ app.post('/save-inquiry', async (req, res) => {
 app.post('/save-visitor', async (req, res) => {
   try {
     const { name, email, phone, title, preferred_room } = req.body;
-    const type = 'visitor';
+    const type = 'visit'; // ✅ correct ENUM value
     const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
     const user_agent = req.headers['user-agent'] || 'Unknown';
 
@@ -171,6 +155,7 @@ app.post('/save-visitor', async (req, res) => {
     res.status(500).json({ error: 'Failed to save visitor' });
   }
 });
+
 
 
 
