@@ -727,13 +727,22 @@ app.get('/api/tenants/upcoming', async (req, res) => {
         r.room_number
       FROM tenants t
       LEFT JOIN payments p 
-        ON t.id = p.tenant_id 
+        ON t.id = p.tenant_id
         AND p.status = 'paid'
-        AND MONTH(p.coverage_period) = MONTH(t.next_due_date)
-        AND YEAR(p.coverage_period) = YEAR(t.next_due_date)
+        AND (
+          (
+            MONTH(p.coverage_period) = MONTH(t.next_due_date)
+            AND YEAR(p.coverage_period) = YEAR(t.next_due_date)
+          )
+          OR (
+            p.coverage_period > t.next_due_date
+          )
+        )
       LEFT JOIN rooms r ON t.room_id = r.id
-      WHERE t.next_due_date > CURDATE() 
+      WHERE 
+        t.next_due_date > CURDATE()
         AND p.id IS NULL
+      ORDER BY t.next_due_date ASC
     `);
 
     const formatted = rows.map(t => ({
