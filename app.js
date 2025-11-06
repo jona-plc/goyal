@@ -671,47 +671,49 @@ app.get('/api/overdue-tenants', async (req, res) => {
   }
 });
 
-app.get('/api/tenants/unpaid', async (req, res) => { 
+// routes/admin.js o kung nasaan man ang API
+app.get('/api/tenants/unpaid', async (req, res) => {
+  const monthFilter = req.query.month; // optional filter
   try {
-    const month = req.query.month; 
-    
-    const [rows] = await pool.query(`
-      WITH RECURSIVE months AS (
-        SELECT 
-          t.id AS tenant_id,
-          DATE_FORMAT(t.start_lease, '%Y-%m-01') AS coverage_month
-        FROM tenants t
-        WHERE t.start_lease IS NOT NULL
-        UNION ALL
-        SELECT 
-          m.tenant_id,
-          DATE_ADD(m.coverage_month, INTERVAL 1 MONTH)
-        FROM months m
-        WHERE DATE_ADD(m.coverage_month, INTERVAL 1 MONTH) <= CURDATE()
-      )
-      SELECT
+    let query = `
+      SELECT 
         t.id,
-        CONCAT(t.first_name, ' ', t.last_name) AS tenant_name,
-        r.room_number,
-        t.monthly_rent AS amount,
-        'Unpaid' AS status,
-        DATE_FORMAT(LAST_DAY(m.coverage_month), '%Y-%m-%d') AS due_date
+        t.first_name,
+        t.last_name,
+        t.next_due_date,
+        t.monthly_rent,
+        r.room_number
       FROM tenants t
-      JOIN months m ON t.id = m.tenant_id
-      LEFT JOIN beds b ON t.bed_id = b.id
-      LEFT JOIN rooms r ON b.room_id = r.id
-      LEFT JOIN payments p
-        ON p.tenant_id = t.id
-        AND DATE_FORMAT(p.coverage_period, '%Y-%m') = DATE_FORMAT(m.coverage_month, '%Y-%m')
+      LEFT JOIN payments p 
+        ON t.id = p.tenant_id AND p.status = 'paid' AND MONTH(p.payment_date) = MONTH(CURDATE())
+      LEFT JOIN rooms r ON t.room_id = r.id
       WHERE p.id IS NULL
-      ${month ? 'AND DATE_FORMAT(m.coverage_month, "%Y-%m") = ?' : ''}
-      ORDER BY t.id, m.coverage_month
-    `, month ? [month] : []);
+    `;
+    
+    const params = [];
 
-    res.json(rows);
+    if (monthFilter) {
+      // Filter by month YYYY-MM
+      query += ` AND DATE_FORMAT(t.next_due_date, '%Y-%m') = ?`;
+      params.push(monthFilter);
+    }
+
+    const [rows] = await pool.query(query, params);
+
+    const formatted = rows.map(t => ({
+      tenant_id: t.id,
+      tenant_name: `${t.first_name} ${t.last_name}`,
+      room_number: t.room_number,
+      amount: t.monthly_rent,
+      due_date: t.next_due_date,
+      status: 'unpaid',
+    }));
+
+    res.json(formatted);
+
   } catch (err) {
     console.error('Error fetching unpaid tenants:', err);
-    res.status(500).json({ error: 'Failed to fetch unpaid tenants' });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -719,25 +721,36 @@ app.get('/api/tenants/upcoming', async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT 
-        t.id AS tenant_id,
-        CONCAT(t.first_name, ' ', t.last_name) AS tenant_name,
-        r.room_number,
-        t.monthly_rent AS amount,
-        'Upcoming' AS status,
-        DATE_FORMAT(DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY), '%Y-%m-%d') AS due_date
+        t.id,
+        t.first_name,
+        t.last_name,
+        t.next_due_date,
+        t.monthly_rent,
+        r.room_number
       FROM tenants t
-      LEFT JOIN beds b ON t.bed_id = b.id
-      LEFT JOIN rooms r ON b.room_id = r.id
-      WHERE t.status = 'active'
-      ORDER BY t.id ASC;
+      LEFT JOIN payments p 
+        ON t.id = p.tenant_id AND p.status = 'paid'
+      LEFT JOIN rooms r ON t.room_id = r.id
+      WHERE t.next_due_date > CURDATE()
     `);
 
-    res.json(rows);
+    const formatted = rows.map(t => ({
+      tenant_id: t.id,
+      tenant_name: `${t.first_name} ${t.last_name}`,
+      room_number: t.room_number,
+      amount: t.monthly_rent,
+      due_date: t.next_due_date,
+      status: 'upcoming',
+    }));
+
+    res.json(formatted);
+
   } catch (err) {
     console.error('Error fetching upcoming tenants:', err);
-    res.status(500).json({ error: 'Failed to fetch upcoming tenants' });
+    res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 
 app.get("/admin/occupants", async (req, res) => {
