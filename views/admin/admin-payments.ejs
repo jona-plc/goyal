@@ -414,7 +414,8 @@
   </main>
   <script>
 window.addEventListener('DOMContentLoaded', () => {
-   const links = document.querySelectorAll('.sidebar a');
+  // Sidebar active link
+  const links = document.querySelectorAll('.sidebar a');
   const currentPath = window.location.pathname;
   links.forEach(link => {
     if (link.getAttribute('href') === currentPath) {
@@ -422,9 +423,9 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-   const rowsPerPage = 6;
+  // ===== Pagination & Search =====
+  const rowsPerPage = 6;
   let currentPage = 1;
-
   const tableBody = document.getElementById('paymentsTableBody');
   let allRows = Array.from(tableBody.querySelectorAll('tr'));
 
@@ -452,7 +453,7 @@ window.addEventListener('DOMContentLoaded', () => {
     pagination.innerHTML = '';
     const pageCount = Math.ceil(allRows.length / rowsPerPage);
 
-     const prevLi = document.createElement('li');
+    const prevLi = document.createElement('li');
     prevLi.className = 'page-item ' + (currentPage === 1 ? 'disabled' : '');
     const prevLink = document.createElement('a');
     prevLink.className = 'page-link';
@@ -469,7 +470,7 @@ window.addEventListener('DOMContentLoaded', () => {
     prevLi.appendChild(prevLink);
     pagination.appendChild(prevLi);
 
-     for (let i = 1; i <= pageCount; i++) {
+    for (let i = 1; i <= pageCount; i++) {
       const li = document.createElement('li');
       li.className = 'page-item' + (i === currentPage ? ' active' : '');
       const link = document.createElement('a');
@@ -486,7 +487,7 @@ window.addEventListener('DOMContentLoaded', () => {
       pagination.appendChild(li);
     }
 
-     const nextLi = document.createElement('li');
+    const nextLi = document.createElement('li');
     nextLi.className = 'page-item ' + (currentPage === pageCount ? 'disabled' : '');
     const nextLink = document.createElement('a');
     nextLink.className = 'page-link';
@@ -504,11 +505,12 @@ window.addEventListener('DOMContentLoaded', () => {
     pagination.appendChild(nextLi);
   }
 
-   allRows.forEach(row => row.style.display = 'none');
+  allRows.forEach(row => row.style.display = 'none');
   displayRows();
   setupPagination();
 
-   const darkModeIcon = document.getElementById('darkModeIcon');
+  // ===== Dark Mode Toggle =====
+  const darkModeIcon = document.getElementById('darkModeIcon');
   window.toggleDarkMode = function() {
     document.body.classList.toggle('dark-mode');
     if (document.body.classList.contains('dark-mode')) {
@@ -519,134 +521,97 @@ window.addEventListener('DOMContentLoaded', () => {
       darkModeIcon.classList.add('bi-sun');
     }
   };
-  
 
-  async function fetchOverdueTenants() {
-  try {
-    const res = await fetch('/api/overdue-tenants');
-    const data = await res.json();
-    const overdueTenants = data.overdue || [];
+  // ===== Panels & Buttons =====
+  const unpaidBadgeBtn = document.getElementById('unpaidBtn');        // Bell badge panel
+  const unpaidPanel = document.getElementById('unpaidPanel');
 
-    const unpaidPanel = document.getElementById('unpaidPanel');
-    const unpaidTableBody = document.getElementById('unpaidTableBody');
-    const unpaidCountBadge = document.getElementById('unpaidCountBadge');
-
-    if (overdueTenants.length === 0) {
-      unpaidPanel.style.display = 'none';
-      unpaidCountBadge.textContent = '0';
-      return;
-    }
-
-    unpaidTableBody.innerHTML = '';
-
-    overdueTenants.forEach((t, index) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${t.tenant_name}</td>
-        <td>${t.room_number || '-'}</td>
-        <td>₱${parseFloat(t.amount).toFixed(2)}</td>
-        <td><span class="badge bg-danger">Overdue</span></td>
-        <td>${t.coverage_period}</td>
-        <td>${t.overdue_days} days</td>
-      `;
-      unpaidTableBody.appendChild(tr);
-    });
-
-    unpaidCountBadge.textContent = overdueTenants.length;
-  } catch (err) {
-    console.error('Error fetching overdue tenants:', err);
-  }
-}
-
- document.getElementById('unpaidBtn').addEventListener('click', () => {
-  const panel = document.getElementById('unpaidPanel');
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-});
-
- document.getElementById('closeUnpaidPanel').addEventListener('click', () => {
-  document.getElementById('unpaidPanel').style.display = 'none';
-});
-
- fetchOverdueTenants();
-
-
-   setInterval(fetchOverdueTenants, 120000);
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const unpaidBtn = document.getElementById('unpaidFilterBtn');
-  const unpaidPanel = document.getElementById('unpaidFilterPanel');
-  const unpaidClose = document.getElementById('closeUnpaidFilter');
-  const unpaidBody = document.getElementById('unpaidFilterBody');
+  const unpaidFilterBtn = document.getElementById('unpaidFilterBtn'); // Filter panel
+  const unpaidFilterPanel = document.getElementById('unpaidFilterPanel');
+  const closeUnpaidFilter = document.getElementById('closeUnpaidFilter');
+  const unpaidFilterBody = document.getElementById('unpaidFilterBody');
   const unpaidMonthSelect = document.getElementById('unpaidMonthSelect');
   const unpaidFilterBtnApply = document.getElementById('unpaidFilterBtnApply');
 
   const upcomingBtn = document.getElementById('upcomingFilterBtn');
   const upcomingPanel = document.getElementById('upcomingFilterPanel');
-  const upcomingClose = document.getElementById('closeUpcomingFilter');
+  const closeUpcomingFilter = document.getElementById('closeUpcomingFilter');
   const upcomingBody = document.getElementById('upcomingFilterBody');
 
-   const now = new Date();
+  // Populate last 12 months
+  const now = new Date();
   for (let i = 0; i < 12; i++) {
-  const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
-  const year = month.getFullYear();
-  const monthNum = String(month.getMonth() + 1).padStart(2, '0'); 
-  const monthValue = `${year}-${monthNum}`;
-  const monthLabel = month.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+    const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const year = month.getFullYear();
+    const monthNum = String(month.getMonth() + 1).padStart(2, '0'); 
+    const monthValue = `${year}-${monthNum}`;
+    const monthLabel = month.toLocaleString(undefined, { month: 'long', year: 'numeric' });
 
-  const option = document.createElement('option');
-  option.value = monthValue;
-  option.textContent = monthLabel;
-  unpaidMonthSelect.appendChild(option);
-}
+    const option = document.createElement('option');
+    option.value = monthValue;
+    option.textContent = monthLabel;
+    unpaidMonthSelect.appendChild(option);
+  }
 
+  // ===== Fetch Functions =====
+  async function fetchOverdueTenants() {
+    try {
+      const res = await fetch('/api/overdue-tenants');
+      const data = await res.json();
+      const overdueTenants = data.overdue || [];
 
-   unpaidBtn.addEventListener('click', () => {
-    unpaidPanel.style.display = unpaidPanel.style.display === 'none' ? 'block' : 'none';
-    upcomingPanel.style.display = 'none';
-    loadUnpaidTenants();  
-  });
-  unpaidClose.addEventListener('click', () => unpaidPanel.style.display = 'none');
+      const unpaidCountBadge = document.getElementById('unpaidCountBadge');
+      const unpaidTableBody = document.getElementById('unpaidTableBody');
 
-  upcomingBtn.addEventListener('click', () => {
-    upcomingPanel.style.display = upcomingPanel.style.display === 'none' ? 'block' : 'none';
-    unpaidPanel.style.display = 'none';
-    loadUpcomingTenants();
-  });
-  upcomingClose.addEventListener('click', () => upcomingPanel.style.display = 'none');
+      if (overdueTenants.length === 0) {
+        unpaidPanel.style.display = 'none';
+        unpaidCountBadge.textContent = '0';
+        return;
+      }
 
-   unpaidFilterBtnApply.addEventListener('click', () => {
-    const selectedMonth = unpaidMonthSelect.value;
-    loadUnpaidTenants(selectedMonth);
-  });
+      unpaidTableBody.innerHTML = '';
+      overdueTenants.forEach((t, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${t.tenant_name}</td>
+          <td>${t.room_number || '-'}</td>
+          <td>₱${parseFloat(t.amount).toFixed(2)}</td>
+          <td><span class="badge bg-danger">Overdue</span></td>
+          <td>${t.coverage_period}</td>
+          <td>${t.overdue_days} days</td>
+        `;
+        unpaidTableBody.appendChild(tr);
+      });
+
+      unpaidCountBadge.textContent = overdueTenants.length;
+    } catch (err) {
+      console.error('Error fetching overdue tenants:', err);
+    }
+  }
 
   async function loadUnpaidTenants(month = '') {
-  unpaidBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>`;
-  try {
-    let url = '/api/tenants/unpaid';
-    if (month) url += `?month=${month}`;  
+    unpaidFilterBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>`;
+    try {
+      let url = '/api/tenants/unpaid';
+      if (month) url += `?month=${month}`;
 
-    const res = await fetch(url);
-    const data = await res.json();
+      const res = await fetch(url);
+      const data = await res.json();
 
-    if (!data || data.length === 0) {
-      unpaidBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No records for this month</td></tr>`;
-      return;
+      if (!data || data.length === 0) {
+        unpaidFilterBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No records for this month</td></tr>`;
+        return;
+      }
+
+      renderTable(data, unpaidFilterBody, 'Unpaid');
+    } catch (err) {
+      console.error('Error loading unpaid tenants:', err);
+      unpaidFilterBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>`;
     }
-
-    renderTable(data, unpaidBody, 'Unpaid');
-  } catch (err) {
-    console.error('Error loading unpaid tenants:', err);
-    unpaidBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>`;
   }
-}
 
- unpaidFilterBtnApply.addEventListener('click', () => {
-  const selectedMonth = unpaidMonthSelect.value;  
-  loadUnpaidTenants(selectedMonth);
-});
-   async function loadUpcomingTenants() {
+  async function loadUpcomingTenants() {
     upcomingBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>`;
     try {
       const res = await fetch('/api/tenants/upcoming');
@@ -658,29 +623,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-function renderTable(rows, container, type) {
-  container.innerHTML = '';
-  if (!rows || rows.length === 0) {
-    container.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No ${type.toLowerCase()} tenants found.</td></tr>`;
-    return;
+  function renderTable(rows, container, type) {
+    container.innerHTML = '';
+    if (!rows || rows.length === 0) {
+      container.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No ${type.toLowerCase()} tenants found.</td></tr>`;
+      return;
+    }
+
+    rows.forEach((t, i) => {
+      const badgeColor = type === 'Upcoming' ? 'bg-info text-dark' : 'bg-danger';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${t.tenant_name}</td>
+        <td>${t.room_number || '-'}</td>
+        <td>₱${parseFloat(t.amount).toFixed(2)}</td>
+        <td><span class="badge ${badgeColor}">${type}</span></td>
+        <td>${t.due_date ? new Date(t.due_date).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' }) : '-'}</td>
+      `;
+      container.appendChild(tr);
+    });
   }
 
-  rows.forEach((t, i) => {
-    const badgeColor = type === 'Upcoming' ? 'bg-info text-dark' : 'bg-danger';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${i + 1}</td>
-      <td>${t.tenant_name}</td>
-      <td>${t.room_number || '-'}</td>
-      <td>₱${parseFloat(t.amount).toFixed(2)}</td>
-      <td><span class="badge ${badgeColor}">${type}</span></td>
-      <td>${t.due_date ? new Date(t.due_date).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' }) : '-'}</td>
-    `;
-    container.appendChild(tr);
+  // ===== Button Events =====
+  unpaidBadgeBtn.addEventListener('click', () => {
+    unpaidPanel.style.display = unpaidPanel.style.display === 'none' ? 'block' : 'none';
+    fetchOverdueTenants();
   });
-}
+
+  unpaidFilterBtn.addEventListener('click', () => {
+    unpaidFilterPanel.style.display = unpaidFilterPanel.style.display === 'none' ? 'block' : 'none';
+    upcomingPanel.style.display = 'none';
+    loadUnpaidTenants();
+  });
+
+  closeUnpaidFilter.addEventListener('click', () => unpaidFilterPanel.style.display = 'none');
+
+  unpaidFilterBtnApply.addEventListener('click', () => {
+    const selectedMonth = unpaidMonthSelect.value;
+    loadUnpaidTenants(selectedMonth);
+  });
+
+  upcomingBtn.addEventListener('click', () => {
+    upcomingPanel.style.display = upcomingPanel.style.display === 'none' ? 'block' : 'none';
+    unpaidFilterPanel.style.display = 'none';
+    loadUpcomingTenants();
+  });
+
+  closeUpcomingFilter.addEventListener('click', () => upcomingPanel.style.display = 'none');
 
 });
+</script>
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
