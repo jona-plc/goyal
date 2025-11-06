@@ -714,6 +714,7 @@ app.get('/api/overdue-tenants', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 app.get('/api/tenants/upcoming', async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -725,14 +726,13 @@ app.get('/api/tenants/upcoming', async (req, res) => {
         t.monthly_rent,
         r.room_number
       FROM tenants t
-      LEFT JOIN payments p 
+      LEFT JOIN payments p
         ON t.id = p.tenant_id
         AND p.status = 'paid'
-        AND MONTH(p.coverage_period) = MONTH(t.next_due_date)
-        AND YEAR(p.coverage_period) = YEAR(t.next_due_date)
+        AND p.coverage_period >= t.next_due_date  -- exclude if already paid for this or future due date
       LEFT JOIN rooms r ON t.room_id = r.id
       WHERE t.next_due_date > CURDATE()
-        AND p.id IS NULL
+        AND p.id IS NULL  -- only include tenants with no payment covering the due date
     `);
 
     const formatted = rows.map(t => ({
