@@ -736,13 +736,7 @@ app.get('/api/tenants/upcoming', async (req, res) => {
           WHERE 
             p.tenant_id = t.id
             AND p.status = 'paid'
-            AND (
-              -- Paid for the upcoming coverage month
-              (YEAR(p.coverage_period) = YEAR(t.next_due_date)
-               AND MONTH(p.coverage_period) = MONTH(t.next_due_date))
-              -- Or advance payment that covers a later month
-              OR (p.coverage_period > t.next_due_date)
-            )
+            AND p.coverage_period >= DATE_FORMAT(t.next_due_date, '%Y-%m-01')
         )
       ORDER BY t.next_due_date ASC
     `);
