@@ -111,8 +111,7 @@ app.get('/login', (req, res) => {
     res.redirect('/');
   });
 });
-// Automatically log visit on home page load
-app.get('/', async (req, res) => {
+ app.get('/', async (req, res) => {
   const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const user_agent = req.headers['user-agent'];
 
@@ -131,7 +130,7 @@ app.get('/', async (req, res) => {
       created_at: new Date()
     };
 
-    io.emit('newVisitor', visitor); // emit live update (optional)
+    io.emit('newVisitor', visitor);  
   } catch (err) {
     console.error('Failed to log visitor:', err);
   }
@@ -139,8 +138,7 @@ app.get('/', async (req, res) => {
   res.render('index', { error: null });
 });
 
-// Visitor logs admin page
-app.get('/admin/visitors', async (req, res) => {
+ app.get('/admin/visitors', async (req, res) => {
   try {
     const [rows] = await pool.query(
       'SELECT * FROM visitors ORDER BY created_at DESC'
@@ -183,8 +181,7 @@ app.post('/save-visitor', async (req, res) => {
 
 
 
-// Socket.io connection
-io.on('connection', socket => {
+ io.on('connection', socket => {
   console.log('Client connected');
 
   socket.on('disconnect', () => {
@@ -192,10 +189,7 @@ io.on('connection', socket => {
   });
 });
 
-
-// -----------------------------
-// Socket.io connection
-// -----------------------------
+ 
 io.on("connection", socket => {
   console.log("Client connected");
   socket.on("disconnect", () => console.log("Client disconnected"));
