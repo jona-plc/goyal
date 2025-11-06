@@ -714,7 +714,6 @@ app.get('/api/overdue-tenants', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
 app.get('/api/tenants/upcoming', async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -727,12 +726,13 @@ app.get('/api/tenants/upcoming', async (req, res) => {
         r.room_number
       FROM tenants t
       LEFT JOIN payments p 
-        ON t.id = p.tenant_id 
-        AND p.status = 'paid' 
-        AND DATE(p.coverage_period) = DATE(t.next_due_date)  -- check kung may bayad na para sa due date
+        ON t.id = p.tenant_id
+        AND p.status = 'paid'
+        AND MONTH(p.coverage_period) = MONTH(t.next_due_date)
+        AND YEAR(p.coverage_period) = YEAR(t.next_due_date)
       LEFT JOIN rooms r ON t.room_id = r.id
-      WHERE t.next_due_date > CURDATE() 
-        AND p.id IS NULL  -- exclude tenants na nakapagbayad na
+      WHERE t.next_due_date > CURDATE()
+        AND p.id IS NULL
     `);
 
     const formatted = rows.map(t => ({
@@ -751,8 +751,6 @@ app.get('/api/tenants/upcoming', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
-
 
 
 app.get("/admin/occupants", async (req, res) => {
