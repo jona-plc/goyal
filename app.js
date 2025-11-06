@@ -671,9 +671,8 @@ app.get('/api/overdue-tenants', async (req, res) => {
   }
 });
 
-// routes/admin.js o kung nasaan man ang API
-app.get('/api/tenants/unpaid', async (req, res) => {
-  const monthFilter = req.query.month; // optional filter
+ app.get('/api/tenants/unpaid', async (req, res) => {
+  const monthFilter = req.query.month;  
   try {
     let query = `
       SELECT 
@@ -693,8 +692,7 @@ app.get('/api/tenants/unpaid', async (req, res) => {
     const params = [];
 
     if (monthFilter) {
-      // Filter by month YYYY-MM
-      query += ` AND DATE_FORMAT(t.next_due_date, '%Y-%m') = ?`;
+       query += ` AND DATE_FORMAT(t.next_due_date, '%Y-%m') = ?`;
       params.push(monthFilter);
     }
 
