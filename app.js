@@ -7,7 +7,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const multer = require('multer');
-
+const cron = require('node-cron');  
 
 const app = express();
 const server = http.createServer(app);
@@ -47,6 +47,23 @@ app.set('views', './views');
   }
   next();
 });
+
+ cron.schedule('*/30 * * * *', async () => {
+  try {
+    console.log('🧹 Running visitor cleanup task...');
+    const [deleted] = await pool.query(`
+      DELETE FROM visitors 
+      WHERE type = 'visitor'
+      AND created_at < NOW() - INTERVAL 5 HOUR
+    `);
+    if (deleted.affectedRows > 0) {
+      console.log(`🗑️ Deleted ${deleted.affectedRows} old visitor records.`);
+    }
+  } catch (err) {
+    console.error('❌ Error cleaning up visitors:', err);
+  }
+});
+
 
  function isAdmin(req, res, next) {
   if (!req.session.isAdmin) return res.redirect('/');
@@ -111,27 +128,43 @@ app.get('/login', (req, res) => {
   });
 });
 
-// Save visitor / inquiry
-app.post('/save-visitor', async (req, res) => {
+app.post('/save-inquiry', async (req, res) => {
   try {
     const { name, email, phone, title, preferred_room } = req.body;
-    const type = 'inquiry'; // change to 'visit' if saving a visit
+    const type = 'inquiry';
     const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
     const user_agent = req.headers['user-agent'] || 'Unknown';
 
-    // Insert into DB (MySQL NOW() gives server time, +08:00 handled in pool)
     const [result] = await pool.query(
       `INSERT INTO visitors (type, name, email, phone, title, preferred_room, ip_address, user_agent, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
       [type, name, email, phone, title, preferred_room, ip_address, user_agent]
     );
 
-    // Fetch newly inserted visitor/inquiry
     const [visitor] = await pool.query(`SELECT * FROM visitors WHERE id = ?`, [result.insertId]);
-
-    // Emit to frontend
     io.emit('new-visitor', visitor[0]);
+    res.status(200).json({ success: true, visitor: visitor[0] });
+  } catch (err) {
+    console.error('Error saving inquiry:', err);
+    res.status(500).json({ error: 'Failed to save inquiry' });
+  }
+});
 
+app.post('/save-visitor', async (req, res) => {
+  try {
+    const { name, email, phone, title, preferred_room } = req.body;
+    const type = 'visitor';
+    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown';
+    const user_agent = req.headers['user-agent'] || 'Unknown';
+
+    const [result] = await pool.query(
+      `INSERT INTO visitors (type, name, email, phone, title, preferred_room, ip_address, user_agent, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+      [type, name, email, phone, title, preferred_room, ip_address, user_agent]
+    );
+
+    const [visitor] = await pool.query(`SELECT * FROM visitors WHERE id = ?`, [result.insertId]);
+    io.emit('new-visitor', visitor[0]);
     res.status(200).json({ success: true, visitor: visitor[0] });
   } catch (err) {
     console.error('Error saving visitor:', err);
@@ -140,8 +173,8 @@ app.post('/save-visitor', async (req, res) => {
 });
 
 
-// For logging page visits
-app.get('/', async (req, res) => {
+
+ app.get('/', async (req, res) => {
   const ip_address = req.ip;
   const user_agent = req.headers['user-agent'];
 
@@ -169,7 +202,7 @@ app.get('/', async (req, res) => {
 
 app.get('/admin/visitors', isAdmin, async (req, res) => {
   try {
-    const { date } = req.query; // e.g., /admin/visitors?date=2025-11-05
+    const { date } = req.query;  
     let query = 'SELECT * FROM visitors WHERE type IN (?, ?)'; 
     const params = ['inquiry', 'everyday visitor'];
 

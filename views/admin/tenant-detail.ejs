@@ -363,7 +363,7 @@ document.addEventListener("DOMContentLoaded", function () {
       roomData = data;
       data.forEach(room => {
         const option = document.createElement('option');
-        option.value = room.room_number; // ✅ send room_number (not room_id)
+        option.value = room.room_number;  
         option.textContent = room.room_number;
         if (room.room_number === "<%= tenant.room_number %>") {
           option.selected = true;
