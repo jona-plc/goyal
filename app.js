@@ -671,21 +671,21 @@ app.get('/api/overdue-tenants', async (req, res) => {
   }
 });
 
-app.get('/api/tenants/unpaid', async (req, res) => {
+app.get('/api/tenants/unpaid', async (req, res) => { 
   try {
     const month = req.query.month; 
     
     const [rows] = await pool.query(`
       WITH RECURSIVE months AS (
-        SELECT t.id AS tenant_id,
-               t.start_lease,
-               DATE_FORMAT(t.start_lease, '%Y-%m-01') AS coverage_month
+        SELECT 
+          t.id AS tenant_id,
+          DATE_FORMAT(t.start_lease, '%Y-%m-01') AS coverage_month
         FROM tenants t
         WHERE t.start_lease IS NOT NULL
         UNION ALL
-        SELECT m.tenant_id,
-               m.start_lease,
-               DATE_ADD(m.coverage_month, INTERVAL 1 MONTH) AS coverage_month
+        SELECT 
+          m.tenant_id,
+          DATE_ADD(m.coverage_month, INTERVAL 1 MONTH)
         FROM months m
         WHERE DATE_ADD(m.coverage_month, INTERVAL 1 MONTH) <= CURDATE()
       )
@@ -694,7 +694,8 @@ app.get('/api/tenants/unpaid', async (req, res) => {
         CONCAT(t.first_name, ' ', t.last_name) AS tenant_name,
         r.room_number,
         t.monthly_rent AS amount,
-        DATE_FORMAT(m.coverage_month, '%Y-%m-01') AS due_date
+        'Unpaid' AS status,
+        DATE_FORMAT(LAST_DAY(m.coverage_month), '%Y-%m-%d') AS due_date
       FROM tenants t
       JOIN months m ON t.id = m.tenant_id
       LEFT JOIN beds b ON t.bed_id = b.id
@@ -714,37 +715,21 @@ app.get('/api/tenants/unpaid', async (req, res) => {
   }
 });
 
-
 app.get('/api/tenants/upcoming', async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      WITH RECURSIVE months AS (
-        SELECT DATE_FORMAT(start_lease, '%Y-%m-01') AS coverage_month, id AS tenant_id
-        FROM tenants
-        WHERE start_lease IS NOT NULL
-        UNION ALL
-        SELECT DATE_ADD(coverage_month, INTERVAL 1 MONTH), tenant_id
-        FROM months
-        WHERE DATE_ADD(coverage_month, INTERVAL 1 MONTH) <= (CURDATE() + INTERVAL 1 MONTH)
-      )
-      SELECT
+      SELECT 
         t.id AS tenant_id,
         CONCAT(t.first_name, ' ', t.last_name) AS tenant_name,
         r.room_number,
         t.monthly_rent AS amount,
         'Upcoming' AS status,
-        DATE_FORMAT(m.coverage_month, '%Y-%m-%d') AS due_date
+        DATE_FORMAT(DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY), '%Y-%m-%d') AS due_date
       FROM tenants t
-      JOIN months m ON m.tenant_id = t.id
       LEFT JOIN beds b ON t.bed_id = b.id
       LEFT JOIN rooms r ON b.room_id = r.id
-      LEFT JOIN payments p
-        ON p.tenant_id = t.id
-        AND p.coverage_period = DATE_FORMAT(m.coverage_month, '%Y-%m')
-      WHERE 
-        MONTH(m.coverage_month) = MONTH(CURDATE() + INTERVAL 1 MONTH)
-        AND YEAR(m.coverage_month) = YEAR(CURDATE() + INTERVAL 1 MONTH)
-      ORDER BY m.coverage_month ASC;
+      WHERE t.status = 'active'
+      ORDER BY t.id ASC;
     `);
 
     res.json(rows);
@@ -753,6 +738,7 @@ app.get('/api/tenants/upcoming', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch upcoming tenants' });
   }
 });
+
 
 app.get("/admin/occupants", async (req, res) => {
   try {
