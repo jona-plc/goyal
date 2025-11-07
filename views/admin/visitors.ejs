@@ -278,21 +278,28 @@ table {
         Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
       </div>
     </div>
-
-    <table class="table table-hover">
+  <div class="container mt-4">
+    <h1>Inquiry Logs</h1>
+    <table class="table table-hover mt-3">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Message</th>
-          <th>Time</th>
+          <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th>Time</th>
         </tr>
       </thead>
-      <tbody id="inquiryTable"></tbody>
+      <tbody>
+        <% visitors.forEach(v => { %>
+        <tr>
+          <td><%= v.id %></td>
+          <td><%= v.name || '-' %></td>
+          <td><%= v.email || '-' %></td>
+          <td><%= v.phone || '-' %></td>
+          <td><%= v.title || '-' %></td>
+          <td><%= new Date(v.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></td>
+        </tr>
+        <% }) %>
+      </tbody>
     </table>
-
+  </div>
     <nav>
       <ul class="pagination" id="pagination"></ul>
     </nav>
