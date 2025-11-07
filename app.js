@@ -111,89 +111,80 @@ app.get('/login', (req, res) => {
     res.redirect('/');
   });
 });
- app.get('/', async (req, res) => {
-  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  const user_agent = req.headers['user-agent'];
+// Log a page visit
+app.get("/", async (req, res) => {
+  const ip_address = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  const user_agent = req.headers["user-agent"];
 
   try {
-    const [result] = await pool.query(
+    await pool.query(
       `INSERT INTO visitors (type, ip_address, user_agent, created_at)
        VALUES ('visit', ?, ?, NOW())`,
       [ip_address, user_agent]
     );
-
-    const visitor = {
-      id: result.insertId,
-      type: 'visit',
-      ip_address,
-      user_agent,
-      created_at: new Date()
-    };
-
-    io.emit('newVisitor', visitor);  
   } catch (err) {
-    console.error('Failed to log visitor:', err);
+    console.error("Failed to log visitor:", err);
   }
 
-  res.render('index', { error: null });
-});
-
- app.get('/admin/visitors', async (req, res) => {
+  // Fetch all inquiries from DB for the frontend
   try {
     const [rows] = await pool.query(
-      'SELECT * FROM visitors ORDER BY created_at DESC'
+      "SELECT * FROM visitors WHERE type = 'inquiry' ORDER BY id DESC"
     );
-    res.render('admin/visitors', { visitors: rows });
+    res.render("index", { visitors: rows }); // EJS will receive the inquiries
   } catch (err) {
-    console.error('Error fetching visitors:', err);
-    res.status(500).send('Database error.');
+    console.error("Failed to load inquiries:", err);
+    res.render("index", { visitors: [], error: err.message });
   }
 });
-app.post('/save-visitor', async (req, res) => {
+
+// Add a new inquiry
+app.post("/api/inquiry", async (req, res) => {
+  const { name, email, phone, title } = req.body;
   try {
-    console.log('Request body:', req.body);
-    let { name, email, phone, title, preferred_room, type } = req.body;
-    console.log('Visitor type:', type);
-
-    type = type || 'inquiry';
-
-    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const user_agent = req.headers['user-agent'] || '';
-
     const [result] = await pool.query(
-      `INSERT INTO visitors 
-      (type, name, email, phone, title, preferred_room, ip_address, user_agent) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [type, name || null, email || null, phone || null, title || null, preferred_room || null, ip_address, user_agent]
+      `INSERT INTO visitors (type, name, email, phone, title, created_at)
+       VALUES ('inquiry', ?, ?, ?, ?, NOW())`,
+      [name, email, phone, title]
     );
 
-    const [rows] = await pool.query('SELECT * FROM visitors WHERE id = ?', [result.insertId]);
-    const newVisitor = rows[0];
+    const newInquiry = {
+      id: result.insertId,
+      name,
+      email,
+      phone,
+      title,
+      type: "inquiry",
+      created_at: new Date(),
+    };
 
-    io.emit('newVisitor', newVisitor);
-
-    res.json({ success: true, visitor: newVisitor });
+    io.emit("newInquiry", newInquiry); // realtime update
+    res.status(201).json({ success: true, inquiry: newInquiry });
   } catch (err) {
-    console.error('Failed to save visitor:', err);
-    res.status(500).json({ success: false, message: 'Failed to save visitor' });
+    console.error("Failed to save inquiry:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-
-
- io.on('connection', socket => {
-  console.log('Client connected');
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
+// API route used by frontend pagination
+app.get("/api/inquiries", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM visitors WHERE type = 'inquiry' ORDER BY id DESC"
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Failed to fetch inquiries:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
- 
-io.on("connection", socket => {
-  console.log("Client connected");
-  socket.on("disconnect", () => console.log("Client disconnected"));
+// Socket.io connection
+io.on("connection", (socket) => {
+  console.log("✅ A user connected");
+  socket.on("disconnect", () => console.log("❌ User disconnected"));
 });
+
 
 app.get('/admin/dashboard', isAdmin, async (req, res) => {
   try {

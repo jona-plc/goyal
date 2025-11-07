@@ -265,96 +265,92 @@ table {
       </div>
     </div>
   </nav>
- <main class="main-content">
-  <h1><i class="bi bi-envelope-fill me-2"></i> Inquiry Logs</h1>
+ <main class="main-content p-4">
+    <h1><i class="bi bi-envelope-fill me-2"></i> Inquiry Logs</h1>
 
-  <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <label for="dateFilter" class="form-label mb-0 me-2 fw-semibold">Filter by Date:</label>
-      <input type="date" id="dateFilter" class="form-control d-inline-block" style="width: 200px;">
-      <button id="resetFilter" class="btn btn-outline-secondary btn-sm ms-2">Reset</button>
+    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <label for="dateFilter" class="form-label mb-0 me-2 fw-semibold">Filter by Date:</label>
+        <input type="date" id="dateFilter" class="form-control d-inline-block" style="width: 200px;">
+        <button id="resetFilter" class="btn btn-outline-secondary btn-sm ms-2">Reset</button>
+      </div>
+      <div class="text-end refresh-text">
+        Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
+      </div>
     </div>
-    <div class="text-end refresh-text">
-      Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
-    </div>
-  </div>
 
-  <!-- Inquiry Table -->
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Message</th>
-        <th>Time</th>
-      </tr>
-    </thead>
-    <tbody id="inquiryTable">
-      <% visitors
-        .filter(v => v.type === 'inquiry')
-        .forEach(v => { %>
-      <tr data-date="<%= new Date(v.created_at).toISOString().split('T')[0] %>">
-        <td><%= v.id %></td>
-        <td><%= v.name || '-' %></td>
-        <td><%= v.email || '-' %></td>
-        <td><%= v.phone || '-' %></td>
-        <td><%= v.title || '-' %></td>
-        <td><%= new Date(v.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></td>
-      </tr>
-      <% }) %>
-    </tbody>
-  </table>
-</main>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Message</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="inquiryTable"></tbody>
+    </table>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-const socket = io();
-const inquiryTable = document.getElementById('inquiryTable');
-const dateFilter = document.getElementById('dateFilter');
-const resetFilter = document.getElementById('resetFilter');
+    <nav>
+      <ul class="pagination" id="pagination"></ul>
+    </nav>
+  </main>
 
-// Listen for new inquiry entries in real time
-socket.on("newVisitor", data => {
-  if (data.type !== 'inquiry') return;
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+let allInquiries = [];
+let currentPage = 1;
+const itemsPerPage = 10;
 
-  const newRow = document.createElement('tr');
-  newRow.setAttribute('data-date', new Date(data.created_at).toISOString().split('T')[0]);
-  newRow.innerHTML = `
-    <td>${data.id}</td>
-    <td>${data.name || '-'}</td>
-    <td>${data.email || '-'}</td>
-    <td>${data.phone || '-'}</td>
-    <td>${data.title || '-'}</td>
-    <td>${new Date(data.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
-  `;
-  inquiryTable.prepend(newRow);
+async function loadInquiries() {
+  const res = await fetch("/api/inquiries");
+  allInquiries = await res.json();
+  renderTable();
+}
 
-  // Hide if date filter active and doesn’t match
-  if (dateFilter.value) {
-    const rowDate = newRow.getAttribute('data-date');
-    newRow.style.display = rowDate === dateFilter.value ? '' : 'none';
-  }
-});
+function renderTable() {
+  inquiryTable.innerHTML = "";
+  const totalPages = Math.ceil(allInquiries.length / itemsPerPage);
+  if (currentPage > totalPages) currentPage = totalPages || 1;
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const paginated = allInquiries.slice(start, end);
 
-// Filter by date
-dateFilter.addEventListener('change', () => {
-  const selectedDate = dateFilter.value;
-  const rows = document.querySelectorAll('#inquiryTable tr');
-  rows.forEach(row => {
-    const rowDate = row.getAttribute('data-date');
-    row.style.display = (!selectedDate || rowDate === selectedDate) ? '' : 'none';
+  paginated.forEach(v => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${v.id}</td>
+      <td>${v.name || '-'}</td>
+      <td>${v.email || '-'}</td>
+      <td>${v.phone || '-'}</td>
+      <td>${v.title || '-'}</td>
+      <td>${new Date(v.created_at).toLocaleString('en-PH')}</td>
+    `;
+    inquiryTable.appendChild(row);
   });
-});
 
-// Reset filter
-resetFilter.addEventListener('click', () => {
-  dateFilter.value = '';
-  const rows = document.querySelectorAll('#inquiryTable tr');
-  rows.forEach(row => row.style.display = '');
-});
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  pagination.innerHTML = "";
+  if (totalPages <= 1) return;
+  for (let i = 1; i <= totalPages; i++) {
+    const li = document.createElement("li");
+    li.className = `page-item ${i === currentPage ? "active" : ""}`;
+    li.innerHTML = `<a class="page-link">${i}</a>`;
+    li.addEventListener("click", () => {
+      currentPage = i;
+      renderTable();
+    });
+    pagination.appendChild(li);
+  }
+}
+
+loadInquiries(); // must be called at the bottom
 </script>
 </body>
 </html>
