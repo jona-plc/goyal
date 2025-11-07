@@ -505,18 +505,17 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   // ===== Panels & Buttons =====
-  const unpaidBadgeBtn = document.getElementById('unpaidBtn');        // Overdue bell button
-  const unpaidPanel = document.getElementById('unpaidPanel');          // Overdue panel
-  const closeUnpaidPanel = document.getElementById('closeUnpaidPanel'); // X button on Overdue panel
+  const unpaidBadgeBtn = document.getElementById('unpaidBtn');        // Bell badge panel
+  const unpaidPanel = document.getElementById('unpaidPanel');
 
-  const unpaidFilterBtn = document.getElementById('unpaidFilterBtn'); // Unpaid filter button
-  const unpaidFilterPanel = document.getElementById('unpaidFilterPanel'); // Unpaid filter panel
-  const closeUnpaidFilter = document.getElementById('closeUnpaidFilter'); // X button on filter panel
+  const unpaidFilterBtn = document.getElementById('unpaidFilterBtn'); // Filter panel
+  const unpaidFilterPanel = document.getElementById('unpaidFilterPanel');
+  const closeUnpaidFilter = document.getElementById('closeUnpaidFilter');
   const unpaidFilterBody = document.getElementById('unpaidFilterBody');
   const unpaidMonthSelect = document.getElementById('unpaidMonthSelect');
   const unpaidFilterBtnApply = document.getElementById('unpaidFilterBtnApply');
 
-  // ===== Populate last 12 months =====
+  // Populate last 12 months
   const now = new Date();
   for (let i = 0; i < 12; i++) {
     const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -531,7 +530,7 @@ window.addEventListener('DOMContentLoaded', () => {
     unpaidMonthSelect.appendChild(option);
   }
 
-  // ===== Fetch Overdue Tenants =====
+  // ===== Fetch Functions =====
   async function fetchOverdueTenants() {
     try {
       const res = await fetch('/api/overdue-tenants');
@@ -568,7 +567,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ===== Fetch Unpaid Tenants =====
   async function loadUnpaidTenants(month = '') {
     unpaidFilterBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>`;
     try {
@@ -590,7 +588,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ===== Table Renderer =====
   function renderTable(rows, container, type) {
     container.innerHTML = '';
     if (!rows || rows.length === 0) {
@@ -614,31 +611,20 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // ===== Button Events =====
-  // Overdue panel toggle
   unpaidBadgeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // prevent document click from closing immediately
     unpaidPanel.style.display = unpaidPanel.style.display === 'none' ? 'block' : 'none';
     fetchOverdueTenants();
   });
 
-  // Close X button for overdue panel
-  closeUnpaidPanel.addEventListener('click', () => {
-    unpaidPanel.style.display = 'none';
-  });
-
-  // Unpaid filter panel toggle
   unpaidFilterBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     unpaidFilterPanel.style.display = unpaidFilterPanel.style.display === 'none' ? 'block' : 'none';
     loadUnpaidTenants();
   });
 
-  // Close X button for filter panel
-  closeUnpaidFilter.addEventListener('click', () => {
-    unpaidFilterPanel.style.display = 'none';
-  });
+  closeUnpaidFilter.addEventListener('click', () => unpaidFilterPanel.style.display = 'none');
 
-  // Apply month filter
   unpaidFilterBtnApply.addEventListener('click', () => {
     const selectedMonth = unpaidMonthSelect.value;
     loadUnpaidTenants(selectedMonth);

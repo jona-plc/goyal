@@ -715,54 +715,6 @@ app.get('/api/overdue-tenants', async (req, res) => {
   }
 });
 
-app.get('/api/tenants/upcoming', async (req, res) => {
-  try {
-    const [rows] = await pool.query(`
-      SELECT 
-        t.id,
-        t.first_name,
-        t.last_name,
-        t.next_due_date,
-        t.monthly_rent,
-        r.room_number
-      FROM tenants t
-      LEFT JOIN rooms r ON t.room_id = r.id
-      WHERE 
-        t.next_due_date > CURDATE()
-        AND NOT EXISTS (
-          SELECT 1 
-          FROM payments p
-          WHERE 
-            p.tenant_id = t.id
-            AND p.status = 'paid'
-            -- if coverage_period or coverage_end covers next_due_date or any future date
-            AND (
-              p.coverage_period >= DATE_SUB(t.next_due_date, INTERVAL 1 DAY)
-              OR (
-                p.coverage_end IS NOT NULL 
-                AND p.coverage_end >= t.next_due_date
-              )
-            )
-        )
-      ORDER BY t.next_due_date ASC
-    `);
-
-    const formatted = rows.map(t => ({
-      tenant_id: t.id,
-      tenant_name: `${t.first_name} ${t.last_name}`,
-      room_number: t.room_number,
-      amount: t.monthly_rent,
-      due_date: t.next_due_date,
-      status: 'upcoming',
-    }));
-
-    res.json(formatted);
-
-  } catch (err) {
-    console.error('Error fetching upcoming tenants:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 
 
 app.get("/admin/occupants", async (req, res) => {
