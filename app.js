@@ -111,6 +111,18 @@ app.get('/login', (req, res) => {
     res.redirect('/');
   });
 });
+app.get("/admin/visitors", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM visitors WHERE type = 'inquiry' ORDER BY id DESC"
+    );
+    res.render("admin-visitors", { visitors: rows });
+  } catch (err) {
+    console.error("Error loading inquiries:", err);
+    res.status(500).send("Failed to load visitor data");
+  }
+});
+
 // Log a page visit
 app.get("/", async (req, res) => {
   const ip_address = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
