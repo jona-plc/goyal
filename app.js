@@ -111,9 +111,7 @@ app.get('/login', (req, res) => {
     res.redirect('/');
   });
 });
-
-// Log a page visit
-app.get('/', async (req, res) => {
+ app.get('/', async (req, res) => {
   const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const user_agent = req.headers['user-agent'];
 
@@ -140,36 +138,62 @@ app.get('/', async (req, res) => {
   res.render('index', { error: null });
 });
 
-// Route to render admin visitors page
-app.get("/admin/visitors", async (req, res) => {
+ app.get('/admin/visitors', async (req, res) => {
   try {
-    // Fetch inquiries from MySQL
     const [rows] = await pool.query(
-      "SELECT * FROM visitors WHERE type = 'inquiry' ORDER BY id DESC"
+      'SELECT * FROM visitors ORDER BY created_at DESC'
     );
-    
-    // Render the EJS template and pass the data
-    res.render("admin/visitors", { visitors: rows });
+    res.render('admin/visitors', { visitors: rows });
   } catch (err) {
-    console.error("Error loading inquiries:", err);
-    res.status(500).send("Failed to load visitor data");
+    console.error('Error fetching visitors:', err);
+    res.status(500).send('Database error.');
+  }
+});
+app.post('/save-visitor', async (req, res) => {
+  try {
+    console.log('Request body:', req.body);
+    let { name, email, phone, title, preferred_room, type } = req.body;
+    console.log('Visitor type:', type);
+
+    type = type || 'inquiry';
+
+    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const user_agent = req.headers['user-agent'] || '';
+
+    const [result] = await pool.query(
+      `INSERT INTO visitors 
+      (type, name, email, phone, title, preferred_room, ip_address, user_agent) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [type, name || null, email || null, phone || null, title || null, preferred_room || null, ip_address, user_agent]
+    );
+
+    const [rows] = await pool.query('SELECT * FROM visitors WHERE id = ?', [result.insertId]);
+    const newVisitor = rows[0];
+
+    io.emit('newVisitor', newVisitor);
+
+    res.json({ success: true, visitor: newVisitor });
+  } catch (err) {
+    console.error('Failed to save visitor:', err);
+    res.status(500).json({ success: false, message: 'Failed to save visitor' });
   }
 });
 
-// API endpoint for frontend pagination
-app.get("/api/inquiries", async (req, res) => {
-  try {
-    const [rows] = await pool.query(
-      "SELECT * FROM visitors WHERE type = 'inquiry' ORDER BY id DESC"
-    );
-    res.json(rows); // returns JSON for JS pagination
-  } catch (err) {
-    console.error("Failed to fetch inquiries:", err);
-    res.status(500).json({ error: err.message });
-  }
+
+
+ io.on('connection', socket => {
+  console.log('Client connected');
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
 
-
+ 
+io.on("connection", socket => {
+  console.log("Client connected");
+  socket.on("disconnect", () => console.log("Client disconnected"));
+});
 
 app.get('/admin/dashboard', isAdmin, async (req, res) => {
   try {
