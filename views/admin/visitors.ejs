@@ -265,176 +265,96 @@ table {
       </div>
     </div>
   </nav>
- 
-  <main class="main-content">
-    <h1><i class="bi bi-person-lines-fill me-2"></i> Visitor Logs</h1>
+ <main class="main-content">
+  <h1><i class="bi bi-envelope-fill me-2"></i> Inquiry Logs</h1>
 
-    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <label for="dateFilter" class="form-label mb-0 me-2 fw-semibold">Filter by Date:</label>
-        <input type="date" id="dateFilter" class="form-control d-inline-block" style="width: 200px;">
-        <button id="resetFilter" class="btn btn-outline-secondary btn-sm ms-2">Reset</button>
-      </div>
-      <div class="text-end refresh-text">
-  Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
-  &nbsp;
-   <i id="inquiryIcon" class="bi bi-envelope-fill text-info position-relative" 
-   style="font-size: 1.8rem; cursor: pointer;" 
-   title="View Inquiries" 
-   data-bs-toggle="modal" 
-   data-bs-target="#inquiryModal">
-   <span id="inquiryBadge" 
-         class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-      0
-   </span>
-</i>
-
- <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="inquiryModalLabel"><i class="bi bi-envelope-fill me-2"></i>Inquiries</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Message</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody id="inquiryTable">
-            <% visitors.filter(v => v.type === 'inquiry').forEach(v => { %>
-            <tr>
-              <td><%= v.id %></td>
-              <td><%= v.name || '-' %></td>
-              <td><%= v.email || '-' %></td>
-              <td><%= v.phone || '-' %></td>
-              <td><%= v.title || '-' %></td>
-              <td><%= new Date(v.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
+  <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <label for="dateFilter" class="form-label mb-0 me-2 fw-semibold">Filter by Date:</label>
+      <input type="date" id="dateFilter" class="form-control d-inline-block" style="width: 200px;">
+      <button id="resetFilter" class="btn btn-outline-secondary btn-sm ms-2">Reset</button>
+    </div>
+    <div class="text-end refresh-text">
+      Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
     </div>
   </div>
-</div>
 
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>Message</th>
-      <th>Type</th>
-      <th>IP Address</th>
-      <th>User Agent</th>
-      <th>Time</th>
-    </tr>
-  </thead>
-  <tbody id="visitorTable">
-    <% visitors.forEach(v => { %>
+  <!-- Inquiry Table -->
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Message</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="inquiryTable">
+      <% visitors
+        .filter(v => v.type === 'inquiry')
+        .forEach(v => { %>
       <tr data-date="<%= new Date(v.created_at).toISOString().split('T')[0] %>">
         <td><%= v.id %></td>
         <td><%= v.name || '-' %></td>
         <td><%= v.email || '-' %></td>
         <td><%= v.phone || '-' %></td>
         <td><%= v.title || '-' %></td>
-        <td>
-          <span class="badge <%= v.type === 'inquiry' ? 'bg-info' : 'bg-success' %>"><%= v.type %></span>
-        </td>
-        <td><%= v.ip_address || '-' %></td>
-        <td><%= v.user_agent || '-' %></td>
         <td><%= new Date(v.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></td>
       </tr>
-    <% }) %>
-  </tbody>
-</table>
-    </div>
-  </main>
+      <% }) %>
+    </tbody>
+  </table>
+</main>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
-const tableBody = document.getElementById('visitorTable');
+const inquiryTable = document.getElementById('inquiryTable');
 const dateFilter = document.getElementById('dateFilter');
 const resetFilter = document.getElementById('resetFilter');
-const inquiryTable = document.getElementById('inquiryTable');
-const inquiryBadge = document.getElementById('inquiryBadge');
-const inquiryIcon = document.getElementById('inquiryIcon');
 
- socket.on("newVisitor", data => {
-   const newRow = document.createElement('tr');
+// Listen for new inquiry entries in real time
+socket.on("newVisitor", data => {
+  if (data.type !== 'inquiry') return;
+
+  const newRow = document.createElement('tr');
   newRow.setAttribute('data-date', new Date(data.created_at).toISOString().split('T')[0]);
-
   newRow.innerHTML = `
     <td>${data.id}</td>
     <td>${data.name || '-'}</td>
     <td>${data.email || '-'}</td>
     <td>${data.phone || '-'}</td>
     <td>${data.title || '-'}</td>
-    <td>
-      <span class="badge ${data.type === 'inquiry' ? 'bg-info' : 'bg-success'}">
-        ${data.type}
-      </span>
-    </td>
-    <td>${data.ip_address || '-'}</td>
-    <td>${data.user_agent || '-'}</td>
     <td>${new Date(data.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
   `;
+  inquiryTable.prepend(newRow);
 
-  tableBody.prepend(newRow);
-
-   if (dateFilter.value) {
+  // Hide if date filter active and doesn’t match
+  if (dateFilter.value) {
     const rowDate = newRow.getAttribute('data-date');
     newRow.style.display = rowDate === dateFilter.value ? '' : 'none';
   }
-
-   if (data.type === 'inquiry') {
-    const modalRow = document.createElement('tr');
-    modalRow.innerHTML = `
-      <td>${data.id}</td>
-      <td>${data.name || '-'}</td>
-      <td>${data.email || '-'}</td>
-      <td>${data.phone || '-'}</td>
-      <td>${data.title || '-'}</td>
-      <td>${new Date(data.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
-    `;
-    inquiryTable.prepend(modalRow);
-
-     let count = parseInt(inquiryBadge.textContent) || 0;
-    inquiryBadge.textContent = count + 1;
-  }
 });
 
- dateFilter.addEventListener('change', () => {
+// Filter by date
+dateFilter.addEventListener('change', () => {
   const selectedDate = dateFilter.value;
-  const rows = document.querySelectorAll('#visitorTable tr');
-
+  const rows = document.querySelectorAll('#inquiryTable tr');
   rows.forEach(row => {
     const rowDate = row.getAttribute('data-date');
     row.style.display = (!selectedDate || rowDate === selectedDate) ? '' : 'none';
   });
 });
 
- resetFilter.addEventListener('click', () => {
+// Reset filter
+resetFilter.addEventListener('click', () => {
   dateFilter.value = '';
-  const rows = document.querySelectorAll('#visitorTable tr');
+  const rows = document.querySelectorAll('#inquiryTable tr');
   rows.forEach(row => row.style.display = '');
 });
-
- inquiryIcon.addEventListener('click', () => {
-  inquiryBadge.textContent = 0;
-});
 </script>
-
 </body>
 </html>
