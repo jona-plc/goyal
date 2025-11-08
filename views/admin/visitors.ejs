@@ -265,188 +265,85 @@ table {
       </div>
     </div>
   </nav>
-  <main class="main-content p-4">
-    <h1><i class="bi bi-person-lines-fill me-2"></i> Visitor Logs</h1>
+ 
+<main class="main-content">
+  <h1><i class="bi bi-envelope-fill me-2"></i> Inquiries</h1>
 
-    <!-- Filter Bar -->
-    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <label for="dateFilter" class="form-label mb-0 me-2 fw-semibold">Filter by Date:</label>
-        <input type="date" id="dateFilter" class="form-control d-inline-block" style="width: 200px;">
-        <button id="resetFilter" class="btn btn-outline-secondary btn-sm ms-2">Reset</button>
-      </div>
+  <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+    <input type="date" id="dateFilter" class="form-control w-auto" />
+    <button id="resetFilter" class="btn btn-secondary btn-sm">Reset Filter</button>
+  </div>
 
-      <div class="text-end refresh-text">
-        Auto-refresh enabled <i class="bi bi-arrow-repeat text-success"></i>
-        &nbsp;
-        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#inquiryModal">
-          Inquiries <span id="inquiryBadge" class="badge bg-danger">0</span>
-        </button>
-      </div>
-    </div>
+  <table class="table table-hover mt-4">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Message</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="inquiryTable">
+      <% visitors.filter(v => v.type === 'inquiry').forEach(v => { %>
+      <tr data-date="<%= new Date(v.created_at).toISOString().split('T')[0] %>">
+        <td><%= v.id %></td>
+        <td><%= v.name || '-' %></td>
+        <td><%= v.email || '-' %></td>
+        <td><%= v.phone || '-' %></td>
+        <td><%= v.title || '-' %></td>
+        <td><%= new Date(v.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' }) %></td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</main>
 
-    <!-- Visitor Table -->
-    <table class="table table-striped" id="visitorTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody id="visitorTableBody"></tbody>
-    </table>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const inquiryTable = document.getElementById('inquiryTable');
+const dateFilter = document.getElementById('dateFilter');
+const resetFilter = document.getElementById('resetFilter');
 
-    <!-- Pagination Controls -->
-    <div class="d-flex justify-content-center align-items-center mt-3 gap-2">
-      <button id="prevPage" class="btn btn-outline-primary btn-sm">Previous</button>
-      <span id="pageInfo" class="fw-semibold"></span>
-      <button id="nextPage" class="btn btn-outline-primary btn-sm">Next</button>
-    </div>
+ socket.on("newVisitor", data => {
+  if (data.type !== 'inquiry') return;  
 
-    <!-- Inquiry Modal -->
-    <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="inquiryModalLabel">Inquiry Logs</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Message</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody id="inquiryTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+  const newRow = document.createElement('tr');
+  newRow.setAttribute('data-date', new Date(data.created_at).toISOString().split('T')[0]);
+  newRow.innerHTML = `
+    <td>${data.id}</td>
+    <td>${data.name || '-'}</td>
+    <td>${data.email || '-'}</td>
+    <td>${data.phone || '-'}</td>
+    <td>${data.title || '-'}</td>
+    <td>${new Date(data.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
+  `;
 
-  </main>
+   inquiryTable.prepend(newRow);
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
-
-  <script>
-  const socket = io();
-
-  const dateFilter = document.getElementById('dateFilter');
-  const resetFilter = document.getElementById('resetFilter');
-  const inquiryTable = document.getElementById('inquiryTable');
-  const inquiryBadge = document.getElementById('inquiryBadge');
-  const visitorTableBody = document.getElementById('visitorTableBody');
-  const prevPageBtn = document.getElementById('prevPage');
-  const nextPageBtn = document.getElementById('nextPage');
-  const pageInfo = document.getElementById('pageInfo');
-
-  let allVisitors = []; // lahat ng visitors
-  let filteredVisitors = []; // filtered by date
-  let currentPage = 1;
-  const rowsPerPage = 5;
-
-  // Render function for main table
-  function renderTable() {
-    visitorTableBody.innerHTML = '';
-
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const visibleRows = filteredVisitors.slice(start, end);
-
-    visibleRows.forEach(data => {
-      const row = document.createElement('tr');
-      row.setAttribute('data-date', new Date(data.created_at).toISOString().split('T')[0]);
-      row.innerHTML = `
-        <td>${data.id}</td>
-        <td>${data.name || '-'}</td>
-        <td>${data.type || '-'}</td>
-        <td>${new Date(data.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
-      `;
-      visitorTableBody.appendChild(row);
-    });
-
-    const totalPages = Math.ceil(filteredVisitors.length / rowsPerPage);
-    pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
-    prevPageBtn.disabled = currentPage === 1;
-    nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+   if (dateFilter.value) {
+    const rowDate = newRow.getAttribute('data-date');
+    newRow.style.display = (rowDate === dateFilter.value) ? '' : 'none';
   }
+});
 
-  // Update filtered data and re-render
-  function applyFilter() {
-    const selectedDate = dateFilter.value;
-    if (selectedDate) {
-      filteredVisitors = allVisitors.filter(v => {
-        const vDate = new Date(v.created_at).toISOString().split('T')[0];
-        return vDate === selectedDate;
-      });
-    } else {
-      filteredVisitors = [...allVisitors];
-    }
-    currentPage = 1;
-    renderTable();
-  }
-
-  // Socket listener for new data
-  socket.on("newVisitor", data => {
-    allVisitors.unshift(data);
-    applyFilter();
-
-    // Add to inquiry modal if inquiry type
-    if (data.type === 'inquiry') {
-      const modalRow = document.createElement('tr');
-      modalRow.innerHTML = `
-        <td>${data.id}</td>
-        <td>${data.name || '-'}</td>
-        <td>${data.email || '-'}</td>
-        <td>${data.phone || '-'}</td>
-        <td>${data.title || '-'}</td>
-        <td>${new Date(data.created_at).toLocaleString('en-PH', { timeZone: 'Asia/Manila' })}</td>
-      `;
-      inquiryTable.prepend(modalRow);
-      inquiryBadge.textContent = parseInt(inquiryBadge.textContent) + 1;
-    }
+ dateFilter.addEventListener('change', () => {
+  const selectedDate = dateFilter.value;
+  const rows = document.querySelectorAll('#inquiryTable tr');
+  rows.forEach(row => {
+    const rowDate = row.getAttribute('data-date');
+    row.style.display = (!selectedDate || rowDate === selectedDate) ? '' : 'none';
   });
+});
 
-  // Pagination controls
-  prevPageBtn.addEventListener('click', () => {
-    if (currentPage > 1) {
-      currentPage--;
-      renderTable();
-    }
-  });
+resetFilter.addEventListener('click', () => {
+  dateFilter.value = '';
+  document.querySelectorAll('#inquiryTable tr').forEach(row => row.style.display = '');
+});
+</script>
 
-  nextPageBtn.addEventListener('click', () => {
-    const totalPages = Math.ceil(filteredVisitors.length / rowsPerPage);
-    if (currentPage < totalPages) {
-      currentPage++;
-      renderTable();
-    }
-  });
-
-  // Filter handlers
-  dateFilter.addEventListener('change', applyFilter);
-  resetFilter.addEventListener('click', () => {
-    dateFilter.value = '';
-    applyFilter();
-  });
-
-  // Reset badge when modal opens
-  const inquiryModal = document.getElementById('inquiryModal');
-  inquiryModal.addEventListener('show.bs.modal', () => {
-    inquiryBadge.textContent = 0;
-  });
-
-  // Initial setup
-  applyFilter();
-  </script>
 </body>
 </html>
