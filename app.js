@@ -589,6 +589,7 @@ app.get("/admin/payments", async (req, res) => {
         t.username AS tenant_name,
         p.amount,
         DATE_FORMAT(p.payment_date, '%Y-%m-%d %H:%i:%s') AS payment_date,
+        p.coverage_period,  
         p.status,
         p.payment_method
       FROM payments p

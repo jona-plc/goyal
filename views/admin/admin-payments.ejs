@@ -262,21 +262,18 @@
 
         <div class="col-md-6 text-end d-flex justify-content-end align-items-center gap-2">
 
-          <!-- Unpaid Filter Button -->
-          <button class="btn btn-danger position-relative" id="unpaidFilterBtn" title="View Unpaid Tenants">
+           <button class="btn btn-danger position-relative" id="unpaidFilterBtn" title="View Unpaid Tenants">
             <i class="bi bi-exclamation-circle-fill"></i>
           </button>
 
-          <!-- Overdue Bell Button -->
-          <button class="btn btn-warning position-relative" id="unpaidBtn" title="View Overdue Tenants">
+           <button class="btn btn-warning position-relative" id="unpaidBtn" title="View Overdue Tenants">
             <i class="bi bi-bell-fill"></i>
             <span id="unpaidCountBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
               0
             </span>
           </button>
 
-          <!-- Unpaid Filter Panel -->
-          <div id="unpaidFilterPanel" class="card shadow-sm p-4 position-absolute"
+           <div id="unpaidFilterPanel" class="card shadow-sm p-4 position-absolute"
                style="top: 90px; right: 150px; width: 700px; max-height: 500px; display: none; z-index: 1100;">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <strong>Unpaid Tenants</strong>
@@ -309,8 +306,7 @@
             </div>
           </div>
 
-          <!-- Overdue Panel -->
-          <div id="unpaidPanel" class="card shadow-sm p-5 position-absolute"
+           <div id="unpaidPanel" class="card shadow-sm p-5 position-absolute"
                style="top: 90px; right: 20px; width: 700px; max-height: 500px; display: none; z-index: 1100;">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <strong>Overdue Tenants</strong>
@@ -340,8 +336,7 @@
         </div>
       </div>
 
-      <!-- Payments Table -->
-      <div class="table-responsive">
+       <div class="table-responsive">
         <table class="table table-striped table-hover align-middle mb-0">
           <thead class="table-primary">
             <tr>
@@ -349,6 +344,7 @@
               <th scope="col">Tenant</th>
               <th scope="col">Amount (₱)</th>
               <th scope="col">Payment Date</th>
+              <th>Coverage</th>   
               <th scope="col">Status</th>
             </tr>
           </thead>
@@ -356,25 +352,42 @@
             <% if (payments.length > 0) { %>
               <% payments.forEach((p, index) => { %>
                 <tr>
-                  <th scope="row"><%= index + 1 %></th>
-                  <td><%= p.tenant_name %></td>
-                  <td>₱<%= Number(p.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></td>
-                  <td><%= new Date(p.payment_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) %></td>
-                  <td class="d-flex align-items-center justify-content-between">
-                    <% if (p.status === 'paid') { %>
-                      <span class="badge bg-success">Paid</span>
-                      <a href="/admin/generate-receipt/<%= p.id %>" class="btn btn-sm btn-outline-primary ms-2">
-                        <i class="bi bi-receipt"></i> Proof of Payment
-                      </a>
-                    <% } else if (p.status === 'pending') { %>
-                      <span class="badge bg-warning text-dark">Pending</span>
-                    <% } else if (p.status === 'failed') { %>
-                      <span class="badge bg-danger">Failed</span>
-                    <% } else { %>
-                      <span class="badge bg-secondary"><%= p.status %></span>
-                    <% } %>
-                  </td>
-                </tr>
+  <th scope="row"><%= index + 1 %></th>
+  <td><%= p.tenant_name %></td>
+
+  <td>
+    ₱<%= Number(p.amount).toLocaleString(undefined, { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+    }) %>
+  </td>
+
+  <td>
+    <%= new Date(p.payment_date).toLocaleDateString(undefined, { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+    }) %>
+  </td>
+
+   <td><%= p.coverage_period || 'N/A' %></td>
+
+   <td class="d-flex align-items-center justify-content-between">
+    <% if (p.status === 'paid') { %>
+      <span class="badge bg-success">Paid</span>
+      <a href="/admin/generate-receipt/<%= p.id %>" class="btn btn-sm btn-outline-primary ms-2">
+        <i class="bi bi-receipt"></i> Proof of Payment
+      </a>
+    <% } else if (p.status === 'pending') { %>
+      <span class="badge bg-warning text-dark">Pending</span>
+    <% } else if (p.status === 'failed') { %>
+      <span class="badge bg-danger">Failed</span>
+    <% } else { %>
+      <span class="badge bg-secondary"><%= p.status %></span>
+    <% } %>
+  </td>
+</tr>
+
               <% }) %>
             <% } else { %>
               <tr>
@@ -396,8 +409,7 @@
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
-  // ===== Sidebar active link =====
-  const links = document.querySelectorAll('.sidebar a');
+   const links = document.querySelectorAll('.sidebar a');
   const currentPath = window.location.pathname;
   links.forEach(link => {
     if (link.getAttribute('href') === currentPath) {
@@ -405,8 +417,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ===== Pagination & Search =====
-  const rowsPerPage = 6;
+   const rowsPerPage = 6;
   let currentPage = 1;
   const tableBody = document.getElementById('paymentsTableBody');
   let allRows = Array.from(tableBody.querySelectorAll('tr'));
@@ -429,70 +440,67 @@ window.addEventListener('DOMContentLoaded', () => {
       row.style.display = (index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage) ? '' : 'none';
     });
   }
+function setupPagination() {
+  const pagination = document.getElementById('pagination');
+  pagination.innerHTML = '';
+  const pageCount = Math.ceil(allRows.length / rowsPerPage);
 
-  function setupPagination() {
-    const pagination = document.getElementById('pagination');
-    pagination.innerHTML = '';
-    const pageCount = Math.ceil(allRows.length / rowsPerPage);
-
-    const prevLi = document.createElement('li');
-    prevLi.className = 'page-item ' + (currentPage === 1 ? 'disabled' : '');
-    const prevLink = document.createElement('a');
-    prevLink.className = 'page-link';
-    prevLink.href = '#';
-    prevLink.innerText = 'Previous';
-    prevLink.addEventListener('click', e => {
-      e.preventDefault();
-      if (currentPage > 1) {
-        currentPage--;
-        displayRows();
-        setupPagination();
-      }
-    });
-    prevLi.appendChild(prevLink);
-    pagination.appendChild(prevLi);
-
-    for (let i = 1; i <= pageCount; i++) {
-      const li = document.createElement('li');
-      li.className = 'page-item' + (i === currentPage ? ' active' : '');
-      const link = document.createElement('a');
-      link.className = 'page-link';
-      link.href = '#';
-      link.innerText = i;
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        currentPage = i;
-        displayRows();
-        setupPagination();
-      });
-      li.appendChild(link);
-      pagination.appendChild(li);
-    }
-
-    const nextLi = document.createElement('li');
-    nextLi.className = 'page-item ' + (currentPage === pageCount ? 'disabled' : '');
-    const nextLink = document.createElement('a');
-    nextLink.className = 'page-link';
-    nextLink.href = '#';
-    nextLink.innerText = 'Next';
-    nextLink.addEventListener('click', e => {
-      e.preventDefault();
-      if (currentPage < pageCount) {
-        currentPage++;
-        displayRows();
-        setupPagination();
-      }
-    });
-    nextLi.appendChild(nextLink);
-    pagination.appendChild(nextLi);
+  if (pageCount <= 1) {
+    pagination.style.display = 'none';
+    return;
   }
+  pagination.style.display = 'flex';
+
+   const prevLi = document.createElement('li');
+  prevLi.className = 'page-item ' + (currentPage === 1 ? 'disabled' : '');
+  const prevLink = document.createElement('a');
+  prevLink.className = 'page-link';
+  prevLink.href = '#';
+  prevLink.innerText = 'Previous';
+  prevLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (currentPage > 1) {
+      currentPage--;
+      displayRows();
+      setupPagination();
+    }
+  });
+  prevLi.appendChild(prevLink);
+  pagination.appendChild(prevLi);
+
+   const currentLi = document.createElement('li');
+  currentLi.className = 'page-item active';
+  const currentLink = document.createElement('a');
+  currentLink.className = 'page-link';
+  currentLink.href = '#';
+  currentLink.innerText = currentPage;
+  currentLi.appendChild(currentLink);
+  pagination.appendChild(currentLi);
+
+   const nextLi = document.createElement('li');
+  nextLi.className = 'page-item ' + (currentPage === pageCount ? 'disabled' : '');
+  const nextLink = document.createElement('a');
+  nextLink.className = 'page-link';
+  nextLink.href = '#';
+  nextLink.innerText = 'Next';
+  nextLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (currentPage < pageCount) {
+      currentPage++;
+      displayRows();
+      setupPagination();
+    }
+  });
+  nextLi.appendChild(nextLink);
+  pagination.appendChild(nextLi);
+}
+
 
   allRows.forEach(row => row.style.display = 'none');
   displayRows();
   setupPagination();
 
-  // ===== Dark Mode Toggle =====
-  const darkModeIcon = document.getElementById('darkModeIcon');
+   const darkModeIcon = document.getElementById('darkModeIcon');
   window.toggleDarkMode = function() {
     document.body.classList.toggle('dark-mode');
     if (document.body.classList.contains('dark-mode')) {
@@ -504,20 +512,18 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ===== Panels & Buttons =====
-  const unpaidBadgeBtn = document.getElementById('unpaidBtn');        // Overdue bell button
-  const unpaidPanel = document.getElementById('unpaidPanel');          // Overdue panel
-  const closeUnpaidPanel = document.getElementById('closeUnpaidPanel'); // X button on Overdue panel
+   const unpaidBadgeBtn = document.getElementById('unpaidBtn');       
+  const unpaidPanel = document.getElementById('unpaidPanel');          
+  const closeUnpaidPanel = document.getElementById('closeUnpaidPanel');  
 
-  const unpaidFilterBtn = document.getElementById('unpaidFilterBtn'); // Unpaid filter button
-  const unpaidFilterPanel = document.getElementById('unpaidFilterPanel'); // Unpaid filter panel
-  const closeUnpaidFilter = document.getElementById('closeUnpaidFilter'); // X button on filter panel
+  const unpaidFilterBtn = document.getElementById('unpaidFilterBtn');  
+  const unpaidFilterPanel = document.getElementById('unpaidFilterPanel'); 
+  const closeUnpaidFilter = document.getElementById('closeUnpaidFilter');  
   const unpaidFilterBody = document.getElementById('unpaidFilterBody');
   const unpaidMonthSelect = document.getElementById('unpaidMonthSelect');
   const unpaidFilterBtnApply = document.getElementById('unpaidFilterBtnApply');
 
-  // ===== Populate last 12 months =====
-  const now = new Date();
+   const now = new Date();
   for (let i = 0; i < 12; i++) {
     const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const year = month.getFullYear();
@@ -531,8 +537,7 @@ window.addEventListener('DOMContentLoaded', () => {
     unpaidMonthSelect.appendChild(option);
   }
 
-  // ===== Fetch Overdue Tenants =====
-  async function fetchOverdueTenants() {
+   async function fetchOverdueTenants() {
     try {
       const res = await fetch('/api/overdue-tenants');
       const data = await res.json();
@@ -568,8 +573,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ===== Fetch Unpaid Tenants =====
-  async function loadUnpaidTenants(month = '') {
+   async function loadUnpaidTenants(month = '') {
     unpaidFilterBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>`;
     try {
       let url = '/api/tenants/unpaid';
@@ -590,8 +594,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ===== Table Renderer =====
-  function renderTable(rows, container, type) {
+   function renderTable(rows, container, type) {
     container.innerHTML = '';
     if (!rows || rows.length === 0) {
       container.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No ${type.toLowerCase()} tenants found.</td></tr>`;
@@ -613,39 +616,32 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ===== Button Events =====
-  // Overdue panel toggle
-  unpaidBadgeBtn.addEventListener('click', (e) => {
+    unpaidBadgeBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     unpaidPanel.style.display = unpaidPanel.style.display === 'none' ? 'block' : 'none';
     fetchOverdueTenants();
   });
 
-  // Close X button for overdue panel
-  closeUnpaidPanel.addEventListener('click', () => {
+   closeUnpaidPanel.addEventListener('click', () => {
     unpaidPanel.style.display = 'none';
   });
 
-  // Unpaid filter panel toggle
-  unpaidFilterBtn.addEventListener('click', (e) => {
+   unpaidFilterBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     unpaidFilterPanel.style.display = unpaidFilterPanel.style.display === 'none' ? 'block' : 'none';
     loadUnpaidTenants();
   });
 
-  // Close X button for filter panel
-  closeUnpaidFilter.addEventListener('click', () => {
+   closeUnpaidFilter.addEventListener('click', () => {
     unpaidFilterPanel.style.display = 'none';
   });
 
-  // Apply month filter
-  unpaidFilterBtnApply.addEventListener('click', () => {
+   unpaidFilterBtnApply.addEventListener('click', () => {
     const selectedMonth = unpaidMonthSelect.value;
     loadUnpaidTenants(selectedMonth);
   });
 
-  // Close panels when clicking outside
-  document.addEventListener('click', (e) => {
+   document.addEventListener('click', (e) => {
     if (!unpaidPanel.contains(e.target) && !e.target.closest('#unpaidBtn')) {
       unpaidPanel.style.display = 'none';
     }
