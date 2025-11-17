@@ -558,7 +558,7 @@ app.get('/admin/generate-receipt/:paymentId', async (req, res) => {
       .moveDown(0.3)
       .text(`Tenant: ${payment.tenant_name}`)
       .moveDown(0.3)
-      .text(`Amount Paid: ₱${Number(payment.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+      .text(`Amount Paid: ${Number(payment.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
       .moveDown(0.3)
       .text(`Payment Date: ${payment.payment_date}`)
       .moveDown(0.3)
