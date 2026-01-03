@@ -441,10 +441,10 @@ app.post('/admin/add-rooms/:id/update', async (req, res) => {
 
     await pool.query('UPDATE rooms SET status = ? WHERE id = ?', [status, id]);
 
-    console.log(`✅ Room ${room_number} updated successfully.`);
+    console.log(` Room ${room_number} updated successfully.`);
     res.redirect('/admin/add-rooms?status=updated');
   } catch (error) {
-    console.error('❌ Error updating room:', error);
+    console.error(' Error updating room:', error);
     res.redirect('/admin/add-rooms?status=error');
   }
 });
@@ -497,7 +497,7 @@ app.get("/admin/api/available-beds", async (req, res) => {
 
     res.json(Object.values(roomMap));
   } catch (err) {
-    console.error("❌ Error fetching rooms and beds:", err);
+    console.error(" Error fetching rooms and beds:", err);
     res.status(500).json({ error: "Server error fetching rooms and beds" });
   }
 });
@@ -761,7 +761,7 @@ app.get("/admin/occupants", async (req, res) => {
 
     res.render("admin/occupants", { rooms: Object.values(rooms) });
   } catch (err) {
-    console.error("❌ Error fetching occupants:", err.message);
+    console.error(" Error fetching occupants:", err.message);
     res.status(500).send("Error fetching occupants");
   }
 });
@@ -827,7 +827,7 @@ app.get('/admin/occupancy-details/:tenantId', async (req, res) => {
 
     res.render("admin/occupancy-details", { tenant, payments });
   } catch (err) {
-    console.error("❌ Error fetching tenant details:", err);
+    console.error("Error fetching tenant details:", err);
     res.status(500).send("Server error");
   }
 })
@@ -932,11 +932,11 @@ app.post('/admin/tenant-update/:id', isAdmin, async (req, res) => {
 
     await conn.commit();
 
-    console.log(`✅ Tenant ${tenantId} updated → Room ${room_number}, Bed ${bed}`);
+    console.log(` Tenant ${tenantId} updated → Room ${room_number}, Bed ${bed}`);
     res.redirect(`/admin/tenant-view/${tenantId}?success=Tenant+updated+successfully`);
   } catch (err) {
     await conn.rollback();
-    console.error('❌ Error updating tenant:', err);
+    console.error(' Error updating tenant:', err);
     res.redirect(`/admin/tenant-view/${tenantId}?error=Error+updating+tenant`);
   } finally {
     conn.release();
@@ -1308,7 +1308,7 @@ app.get('/admin/create-tenant', isAdmin, async (req, res) => {
     const { status, message } = req.query;
     res.render('admin/create-tenant', { status, message, tenants });
   } catch (err) {
-    console.error('❌ Error loading tenants:', err);
+    console.error(' Error loading tenants:', err);
     res.render('admin/create-tenant', { status: 'failed', message: 'Failed to load tenants', tenants: [] });
   }
 });
@@ -1392,7 +1392,7 @@ app.post('/admin/create-tenant', isAdmin, async (req, res) => {
     return res.redirect('/admin/create-tenant?status=success&message=Tenant+created+successfully');
 
   } catch (err) {
-    console.error('❌ DB Error:', err);
+    console.error(' DB Error:', err);
     return res.redirect('/admin/create-tenant?status=failed&message=Error+creating+tenant');
   }
 });
@@ -2072,7 +2072,7 @@ app.post('/xendit/webhook', express.raw({ type: 'application/json' }), async (re
     const event = JSON.parse(rawBody);
 
     if (!event.status || event.status.toUpperCase() !== 'PAID') {
-      console.log(`ℹ️ Ignored webhook: status=${event.status}`);
+      console.log(`ℹIgnored webhook: status=${event.status}`);
       return res.status(200).send('Ignored');
     }
 
@@ -2126,10 +2126,10 @@ app.post('/xendit/webhook', express.raw({ type: 'application/json' }), async (re
       }
     }
 
-    console.log(`✅ Tenant ${tenantId} payment for ${coveragePeriod} marked as PAID`);
+    console.log(` Tenant ${tenantId} payment for ${coveragePeriod} marked as PAID`);
     res.status(200).send('OK');
   } catch (err) {
-    console.error('❌ Webhook error:', err);
+    console.error(' Webhook error:', err);
     res.status(500).send('Webhook failed');
   }
 });

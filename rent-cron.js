@@ -28,24 +28,24 @@ async function generateRentRecords() {
            VALUES (?, ?, ?, 'pending')`,
           [tenant.id, tenant.monthly_rent, dueDate]
         );
-        console.log(`✅ Rent created for tenant ${tenant.id}`);
+        console.log(` Rent created for tenant ${tenant.id}`);
       } else {
-        console.log(`⚠️ Already exists for tenant ${tenant.id}`);
+        console.log(` Already exists for tenant ${tenant.id}`);
       }
     }
   } catch (err) {
-    console.error('❌ Error generating rent records:', err);
+    console.error(' Error generating rent records:', err);
   }
 }
 
 cron.schedule('0 0 1 * *', () => {
-  console.log('⏰ Running monthly rent generation...');
+  console.log(' Running monthly rent generation...');
   generateRentRecords();
 });
 
 if (require.main === module) {
   generateRentRecords().then(() => {
-    console.log('✅ Manual generation complete');
+    console.log(' Manual generation complete');
     process.exit(0);
   });
 }
